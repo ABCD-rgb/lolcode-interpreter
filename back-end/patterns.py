@@ -10,16 +10,18 @@ codeDelimiters = {
 # ================================
 
 
+
 #  === comments ===
 comments = {
     ("BTW", "Comment"),
     ("OBTW", "Start of Multiline Comment"),
     ("TLDR", "End of Multiline Comment"),
 }
-
 # =================
 
+
 iKeyword = ("I", "I Keyword") 
+
 
 # === variables ===
 variableSegment = {
@@ -39,6 +41,7 @@ variableAssignment = {
 # ==================
 
 
+
 # === data types ===
 yarnLiteral = ("\"([^\"]*)\"", "yarn literal")
 numbrLiteral = ("-?[0-9]+", "numbr literal")
@@ -46,6 +49,7 @@ numbarLiteral = ("(-)?[0-9]*\.?[0-9]+", "numbar lite")
 troofLiteral = ("WIN|FAIL", "troof literal")
 typeLiteral = ("NOOB|TROOF|NUMBR|NUMBAR|YARN")
 # ==================
+
 
 
 # === input/output operations ===
@@ -72,6 +76,7 @@ arithmeticOperators = {
 
 arithmeticOf = ("OF")
 # =============================
+
 
 
 # === concatenation ===
@@ -104,7 +109,6 @@ infBooleanOperatorsOf = ("OF")
 
 
 
-
 # === comparison operations ===
 bothOperators = {
     ("SAEM", "Equality Operator"),
@@ -113,6 +117,7 @@ bothOperators = {
 
 differentSymbol = ("DIFFRINT", "Inequality")
 # =============================
+
 
 
 # === typecasting statements ===
@@ -127,11 +132,13 @@ IhasA = ("HAS", "A")
 # ==============================
 
 
+
 # === assignment statements ===
 assignmentOperator = {
     ("R", "assignment operator")
 }
 # ==============================
+
 
 
 # === flow-control statements ===
@@ -180,6 +187,7 @@ loopConditionKeyWord = {
 # ================================
 
 
+
 # === function definitions ===
 functionKeyWord = ("HOW", "function keyword")
 
@@ -189,9 +197,11 @@ yrKeyWord = ("YR", "YR keyword")
 # ============================
 
 
+
 # === function return ===
 returnKeyWord = ("FOUND", "return keyword")
 # ========================
+
 
 
 # === function call ===
@@ -199,8 +209,7 @@ Iiz = ("Iz")
 # =====================
 
 
+
 # === identifiers ===
 identifier = ("[a-zA-Z][a-zA-Z0-9_]*", "identifier")
 # ===================
-
-

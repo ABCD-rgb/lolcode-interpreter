@@ -1,5 +1,6 @@
 HAI                       
-I HAS A var ITZ 12          
+I HAS A var ITZ 12       
+BTW no need to support this   
 SUM OF 2 AN 3.14                  
 DIFF OF 4 AN 7
 SUM OF QUOSHUNT OF PRODUKT OF 3 AN 4 AN 2 AN 1
@@ -9,6 +10,9 @@ DIFFRINT 1 AN 2
 EITHER OF 4 AN 7
 WON OF 4 AN 1
 NOT 9
+OBTW this
+Way
+TLDR
 ANY OF 8 AN 7 MKAY
 ALL OF 6 AN 7 MKAY
 SMOOSH 4 AN 5 AN 6 AN 7
