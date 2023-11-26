@@ -1,0 +1,39 @@
+HAI                       
+I HAS A var ITZ 12       
+BTW no need to support this   
+SUM OF 2 AN 3.14                  
+DIFF OF 4 AN 7
+SUM OF QUOSHUNT OF PRODUKT OF 3 AN 4 AN 2 AN 1
+BOTH OF 5 AN 5
+BOTH SAEM 9 AN 10
+DIFFRINT 1 AN 2
+EITHER OF 4 AN 7
+WON OF 4 AN 1
+NOT 9
+OBTW this
+Way
+TLDR
+ANY OF 8 AN 7 MKAY
+ALL OF 6 AN 7 MKAY
+SMOOSH 4 AN 5 AN 6 AN 7
+VISIBLE "noot    noot" var
+I HAS A var1 ITZ 12
+MAEK var1 A NUMBAR
+number IS NOW A NUMBAR
+number R MAEK number YARN
+O RLY?
+YA RLY
+MEBBE
+NO WAI
+OIC
+WTF?
+OMG
+OMGWTF
+OIC
+IM IN YR print10 UPPIN YR temp TIL BOTH SAEM temp AN 10
+VISIBLE temp
+GTFO
+IM OUTTA YR print10
+GIMMEH variable
+VISIBLE variable
+KTHXBYE

@@ -3,8 +3,8 @@
 
 # === start and end of program ===
 codeDelimiters = {
-    ("HAI", "Start of Code"),
-    ("KTHXBYE", "End of Code"),
+    ("HAI", "Start of Code Keyword"),
+    ("KTHXBYE", "End of Code Keyword"),
 }
 
 # ================================
@@ -13,9 +13,9 @@ codeDelimiters = {
 
 #  === comments ===
 comments = {
-    ("BTW", "Comment"),
-    ("OBTW", "Start of Multiline Comment"),
-    ("TLDR", "End of Multiline Comment"),
+    ("BTW", "Comment Keyword"),
+    ("OBTW", "Start of Multiline Comment Keyword"),
+    ("TLDR", "End of Multiline Comment Keyword"),
 }
 # =================
 
@@ -25,53 +25,53 @@ iKeyword = ("I", "I Keyword")
 
 # === variables ===
 variableSegment = {
-    ("WAZZUP", "Start of Variable Declaration"),
-    ("BUHBYE", "End of Variable Declaration"),
+    ("WAZZUP", "Start of Variable Declaration Keyword"),
+    ("BUHBYE", "End of Variable Declaration Keyword"),
 }
 
-variableDeclaration = {
-    ("ITZ", "Variable Initialization"),
+variableInitialization = {
+    ("ITZ", "Variable Initialization Keyword"),
 }
 
-IhasA = ( "HAS", "A")
+IhasA = ("HAS", "A", "Variable Declaration Keyword")
 
 variableAssignment = {
-    ("R", "Variable Assignment"),
+    ("R", "Variable Assignment Keyword"),
 }
 # ==================
 
 
-
+#  TODO
 # === data types ===
-yarnLiteral = ("\"([^\"]*)\"", "yarn literal")
-numbrLiteral = ("-?[0-9]+", "numbr literal")
-numbarLiteral = ("(-)?[0-9]*\.?[0-9]+", "numbar lite")
-troofLiteral = ("WIN|FAIL", "troof literal")
-typeLiteral = ("NOOB|TROOF|NUMBR|NUMBAR|YARN")
+yarnLiteral = ("\"([^\"]*)\"", "YARN Literal")
+numbrLiteral = ("^-?[0-9]+$", "NUMBR Literal")
+numbarLiteral = ("^(-)?[0-9]*\.?[0-9]+$", "NUMBAR Literal")
+troofLiteral = ("WIN|FAIL", "TROOF Literal")
+typeLiteral = ("NOOB|TROOF|NUMBR|NUMBAR|YARN", "TYPE Literal")
 # ==================
 
 
 
 # === input/output operations ===
 ioKeyword = {
-    ("GIMMEH", "input keyword"),
-    ("VISIBLE", "output keyword")
+    ("GIMMEH", "Input Keyword"),
+    ("VISIBLE", "Output Keyword")
 }
 # ===============================
 
 
-anSymbol = ("AN", "Conjunction")    # used in many operations
+anSymbol = {("AN", "Conjunction Symbol Keyword")}    # used in many operations
 
 
 # === arithmetic operations ===
 arithmeticOperators = {
-    ("SUM", "Addition"),
-    ("DIFF", "Subtraction"),
-    ("PRODUKT", "Multiplication"),
-    ("QUOSHUNT", "Division"),
-    ("MOD", "Modulo"),
-    ("BIGGR", "Greater Symbol"),
-    ("SMALLR", "Lesser Symbol"),
+    ("SUM", "Addition Operator Keyword"),
+    ("DIFF", "Subtraction Operator Keyword"),
+    ("PRODUKT", "Multiplication Operator Keyword"),
+    ("QUOSHUNT", "Division Operator Keyword"),
+    ("MOD", "Modulo Operator Keyword"),
+    ("BIGGR", "Greater Symbol Keyword"),
+    ("SMALLR", "Lesser Symbol Keyword"),
 }
 
 arithmeticOf = ("OF")
@@ -80,29 +80,30 @@ arithmeticOf = ("OF")
 
 
 # === concatenation ===
-smooshKeyword = ("SMOOSH", "Concatenation Keyword")
+smooshKeyword = {("SMOOSH", "Concatenation Keyword")}
 # =====================
 
 
-bothSymbol = ("BOTH")   # used in boolean and comparison operations
+bothSymbol = {("BOTH", "AND Symbol Keyword")}   # used in boolean and comparison operations
 
 
 # === boolean operations ===
 # Boolean Operators - Except Both
 booleanOperators = {
-    ("EITHER", "or symbol"),
-    ("WON", "xor symbol"),
-    ("NOT", "not symbol"),
+    ("EITHER", "OR Symbol Keyword"),
+    ("WON", "XOR Symbol Keyword"),
+    ("NOT", "NOT Symbol Keyword"),
 }
 
 booleanOperatorsOf = ("OF")
 
 # Infinite Boolean Operators
 infBooleanOperators = {
-    ("ALL", "all symbol"),
-    ("ANY", "any symbol"),
-    ("MKAY", "end of infinite boolean operator"),   
+    ("ALL", "Infinite Arity AND Symbol Keyword"),
+    ("ANY", "infinite Arity OR Symbol Keyword"), 
 }
+
+endInfBooleanOperators = {("MKAY", "End Of Infinite Boolean Operators Keyword")}
 
 infBooleanOperatorsOf = ("OF")
 # ==========================
@@ -110,32 +111,28 @@ infBooleanOperatorsOf = ("OF")
 
 
 # === comparison operations ===
-bothOperators = {
-    ("SAEM", "Equality Operator"),
-    ("OF", "Comparison Operator"),
-}
-
-differentSymbol = ("DIFFRINT", "Inequality")
+bothOperators = ("SAEM", "Equality Operator Keyword")
+differentSymbol = {("DIFFRINT", "Inequality Operator Keyword")}
 # =============================
 
 
 
 # === typecasting statements ===
-castKeyword = {
-    ("MAEK", "Typecasting Keyword"),
-    ("IS", "Typecasting Keyword"),
+castSymbol= {
+    ("MAEK", "Explicit Typecasting Keyword"),
     ("A", "Optional Typecasting Keyword"),
 }
 
+recastSymbol = {("IS", "Re-casting Keyword")}    
+
 IsNowA = ("NOW", "A")
-IhasA = ("HAS", "A")
 # ==============================
 
 
 
 # === assignment statements ===
 assignmentOperator = {
-    ("R", "assignment operator")
+    ("R", "Assignment Operator Keyword")
 }
 # ==============================
 
@@ -144,11 +141,13 @@ assignmentOperator = {
 # === flow-control statements ===
 # If-then
 ifThenOperator = {
-    ("O", "if-then start"),
-    ("YA", "if statement"),
-    ("NO", "else statement"),
-    ("MEBBE", "if-else statament")
+    ("O", "If-Then Start Keyword"),
+    ("YA", "If Statement Keyword"),
+    ("NO", "Else Statement Keyword"),
+    
 }
+
+mebbeOperator = {("MEBBE", "Else-if Statement Keyword")}
 
 oRly = "RLY?"
 yaRly = "RLY"
@@ -156,60 +155,64 @@ noWai = "WAI"
 
 # Switch case
 switchCaseOperators = {
-    ("WTF?", "switch case start"),
-    ("OMG", "case operator"),
-    ("OMGWTF", "default case")    
+    ("WTF?", "Switch Case Start Keyword"),
+    ("OMG", "Case Operator Keyword"),
+    ("OMGWTF", "Default Case Keyword")    
 }
 
-endFlowControl = ("OIC", "control flow end")
+endFlowControl = {("OIC", "Control Flow End Keyword")}
 
 # Loops
-imKeyWord = ("IM", "IM keyword")
+imKeyWord = ("IM")
 
 loopKeyword = {
-    ("IN", "loop start"),
-    ("OUTTA", "loop end")
+    ("IN", "Loop Start Keyword"),
+    ("OUTTA", "Loop End Keyword")
 }
 
-yrKeyWord = ("YR", "YR keyword")    # used in loop and function
+yrKeyWordLoop = ("YR")    # used in loop and function
 
 loopOperationKeyword = {
-    ("UPPIN", "increment keyword"),
-    ("NERFIN", "decrement keyword")
+    ("UPPIN", "Increment Keyword"),
+    ("NERFIN", "Decrement Keyword")
 }
 
-gtfoKeyWord = ("GTFO", "GTFO keyword")  # used in loop and function
+gtfoKeyWord = {("GTFO", "GTFO Keyword")}  # used in loop and function
 
 loopConditionKeyWord = {
-    ("TIL", "loop condition keyword"),
-    ("WILE", "loop condition keyword")
+    ("TIL", "Loop Condition Keyword"),
+    ("WILE", "Loop Condition Keyword")
 }
 # ================================
 
 
 
 # === function definitions ===
-functionKeyWord = ("HOW", "function keyword")
+functionKeyWord = {("HOW", "Function Definition Keyword")}
 
 HowIzI = ("Iz", "I")
 
-yrKeyWord = ("YR", "YR keyword")
+yrKeyWord = {("YR", "YR Keyword")}
+
+exitFunction = {("IF", "Exit Function Keyword")}
+
+ifUSaySo = ("U", "SAY", "SO") 
 # ============================
 
 
 
 # === function return ===
-returnKeyWord = ("FOUND", "return keyword")
+returnKeyWord = {("FOUND", "Return Keyword")}
 # ========================
 
 
 
 # === function call ===
-Iiz = ("Iz")
+Iiz = ("IZ", "Function Call Keyword")
 # =====================
 
 
 
 # === identifiers ===
-identifier = ("[a-zA-Z][a-zA-Z0-9_]*", "identifier")
+identifier = ("^[a-zA-Z][a-zA-Z0-9_]*$", "Identifier")
 # ===================
