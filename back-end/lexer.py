@@ -9,9 +9,9 @@ class Lexeme:
     def __repr__(self):  # For debugging
         return f"Lexeme({self.keyword}, {self.token_type})"
 
-def main():
+def lexer(input_file):
     # Remove comments BTW, OBTW, TLDR
-    with open("test.lol", "r") as f:
+    with open(input_file, "r") as f:
         f = f.read().splitlines()
         f = [line.strip() for line in f]    # remove traling and leading spaces 
 
@@ -75,7 +75,6 @@ def main():
             else:
                 curr_keyword += letter
 
-    print(f"{tokens}\n\n")
     
     # Helper function to look ahead by one token
     def lookAhead(tokens, i):
@@ -135,16 +134,14 @@ def main():
         for symbol in p.variableInitialization:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
-                detected = True
-              
+                detected = True 
                 break
         
         # For input and output
         for symbol in p.ioKeyword:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
-                detected = True
-             
+                detected = True       
                 break
         
         # For conjunctions
@@ -152,7 +149,6 @@ def main():
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
-              
                 break
             
         # For arithmetic operators
@@ -164,13 +160,14 @@ def main():
                     i+=2
                     detected = False
                     break
+
         # For concatenation
         for symbol in p.smooshKeyword:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
-             
                 break
+
         # For both operators
         for symbol in p.bothSymbol:
             if tokens[i] == symbol[0]:
@@ -187,6 +184,7 @@ def main():
                     i+=2
                     detected = False
                     break
+
         #  For boolean operators 
         for symbol in p.booleanOperators:
             if tokens[i] == symbol[0]:
@@ -196,6 +194,7 @@ def main():
                     i+=2
                     detected = False
                     break
+
         # For infinite arity boolean operators    
         for symbol in p.infBooleanOperators:
             if tokens[i] == symbol[0]:
@@ -205,6 +204,7 @@ def main():
                     i+=2
                     detected = False
                     break
+
         # For end of infinite arity boolean operators 
         for symbol in p.endInfBooleanOperators:
             if tokens[i] == symbol[0]:
@@ -218,12 +218,14 @@ def main():
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
                 break
+
         # For typecasting
         for symbol in p.castSymbol:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
                 break
+
         # For type recasting
         for symbol in p.recastSymbol:
             if tokens[i] == symbol[0]:
@@ -234,13 +236,14 @@ def main():
                     i+=3
                     detected = False
                     break
+
         # For assignment operators
         for symbol in p.assignmentOperator:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
-            
                 break
+
         # For if-then operators
         for symbol in p.ifThenOperator:
             if tokens[i] == symbol[0]:
@@ -255,7 +258,6 @@ def main():
                     
                 elif symbol[0] == "YA":
                     if next_token == p.yaRly:
-                        print("UY PUMASOK")
                         lexemes.append(Lexeme(tokens[i] + " " + next_token, symbol[1]))
                         detected = True
                         i+=2
@@ -273,14 +275,13 @@ def main():
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
-       
                 break
+
         # For end of switch case operators
         for symbol in p.endFlowControl:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
-         
                 break
             
         # For I'm outta yr loop
@@ -320,19 +321,19 @@ def main():
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
                 break
+
         # For functions
         for symbol in p.functionKeyWord:
             if tokens[i] == symbol[0]:
                 next_token1 =lookAhead(tokens, i)
                 next_token2= lookAhead(tokens, i+1)
-                print("pumasok dito")
                 if next_token1 == p.HowIzI[0] and next_token2 == p.HowIzI[1]:
-                    print("pumasok")
                     lexemes.append(Lexeme(tokens[i] + " " + next_token1 + " " + next_token2, symbol[1]))
                     detected = True
                     i+=3
                     detected = False
                     break
+
         # For returning values 
         for symbol in p.returnKeyWord:
             if tokens[i] == symbol[0]:
@@ -343,6 +344,7 @@ def main():
                     i+=2
                     detected = False
                     break
+                
         # For exitting functions
         for symbol in p.exitFunction:
             if tokens[i] == symbol[0]:
@@ -398,10 +400,11 @@ def main():
         i+=1
     
     # print lexemes
-    for lexeme in lexemes:
-        print("========================================")
-        print(f"KEYWORD: {lexeme.keyword}\nTOKEN TYPE: {lexeme.token_type}")
-            
+    # for lexeme in lexemes:
+    #     print("========================================")
+    #     print(f"KEYWORD: {lexeme.keyword}\nTOKEN TYPE: {lexeme.token_type}")
+    
+    return lexemes
             
             
 
