@@ -139,13 +139,6 @@ def main():
               
                 break
         
-        # For variable assignment
-        for symbol in p.variableAssignment:
-            if tokens[i] == symbol[0]:
-                lexemes.append(Lexeme(tokens[i], symbol[1]))
-                detected = True
-                break
-        
         # For input and output
         for symbol in p.ioKeyword:
             if tokens[i] == symbol[0]:
@@ -259,15 +252,14 @@ def main():
                         detected = True
                         i+=2
                         detected = False
-                        break
                     
                 elif symbol[0] == "YA":
                     if next_token == p.yaRly:
+                        print("UY PUMASOK")
                         lexemes.append(Lexeme(tokens[i] + " " + next_token, symbol[1]))
                         detected = True
                         i+=2
                         detected = False
-                        break
                     
                 elif symbol[0] == "NO":
                     if next_token == p.noWai:
@@ -275,7 +267,7 @@ def main():
                         detected = True
                         i+=2
                         detected = False
-                        break
+
         # For switch case operators  
         for symbol in p.switchCaseOperators:
             if tokens[i] == symbol[0]:
@@ -327,14 +319,16 @@ def main():
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
                 detected = True
-
                 break
         # For functions
         for symbol in p.functionKeyWord:
             if tokens[i] == symbol[0]:
-                next_tokens = (lookAhead(tokens, i), lookAhead(tokens, i+1))  
-                if next_tokens == p.HowIzI:
-                    lexemes.append(Lexeme(tokens[i] + " " + next_tokens[0] + " " + next_tokens[1], symbol[1]))
+                next_token1 =lookAhead(tokens, i)
+                next_token2= lookAhead(tokens, i+1)
+                print("pumasok dito")
+                if next_token1 == p.HowIzI[0] and next_token2 == p.HowIzI[1]:
+                    print("pumasok")
+                    lexemes.append(Lexeme(tokens[i] + " " + next_token1 + " " + next_token2, symbol[1]))
                     detected = True
                     i+=3
                     detected = False
@@ -367,12 +361,8 @@ def main():
 
         # Literals
         if not detected:
-            # Check if string
-            if lookBehind(tokens, i) == "\"" and lookAhead(tokens, i) == "\"":
-                lexemes.append(Lexeme(tokens[i], p.yarnLiteral[1]))
-                detected = True
             # Check if numbr
-            elif re.search(p.numbrLiteral[0], tokens[i]):
+            if re.search(p.numbrLiteral[0], tokens[i]):
                 lexemes.append(Lexeme(tokens[i], p.numbrLiteral[1]))
                 detected = True
             # Check if numbar
@@ -382,6 +372,10 @@ def main():
             # Check if troof
             elif re.search(p.troofLiteral[0], tokens[i]):
                 lexemes.append(Lexeme(tokens[i], p.troofLiteral[1]))
+                detected = True
+            # Check if string
+            elif lookBehind(tokens, i) == "\"" and lookAhead(tokens, i) == "\"":
+                lexemes.append(Lexeme(tokens[i], p.yarnLiteral[1]))
                 detected = True
             # Check if type literal
             elif re.search(p.typeLiteral[0], tokens[i]):

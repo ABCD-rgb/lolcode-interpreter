@@ -35,9 +35,9 @@ variableInitialization = {
 
 IhasA = ("HAS", "A", "Variable Declaration Keyword")
 
-variableAssignment = {
-    ("R", "Variable Assignment Keyword"),
-}
+# variableAssignment = {
+#     ("R", "Variable Assignment Keyword"),
+# }
 # ==================
 
 
@@ -190,7 +190,7 @@ loopConditionKeyWord = {
 # === function definitions ===
 functionKeyWord = {("HOW", "Function Definition Keyword")}
 
-HowIzI = ("Iz", "I")
+HowIzI = ("IZ", "I")
 
 yrKeyWord = {("YR", "YR Keyword")}
 
