@@ -394,7 +394,7 @@ def lexer(input_file):
         
         if not detected:
             # Raise an error
-            print(f"Lexical Error: {tokens[i]} is not a valid token")
+            raise Exception(f"Lexical Error: {tokens[i]} is not a valid token")
         
         detected = False      
         i+=1

@@ -9,6 +9,7 @@ HAI
             Way
     TLDR
     I IZ this_is_a_function MKAY
+    ""
     SUM OF QUOSHUNT OF PRODUKT OF 3 AN 4 AN 2 AN 1
     BOTH SAEM x AN y
     BOTH OF e1 AN w1
