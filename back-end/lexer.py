@@ -96,8 +96,8 @@ def lexer(input_file):
 
     while i < len(tokens):
         detected = False # If token is detected, skip to next token
-        
         # Symbol Detection for code delimiters 
+        continue_flag = False
         for symbol in p.codeDelimiters:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1])) # append the symbol and its token type
@@ -109,8 +109,7 @@ def lexer(input_file):
         for symbol in p.variableSegment:
             if tokens[i] == symbol[0]:
                 lexemes.append(Lexeme(tokens[i], symbol[1]))
-                detected = True
-             
+                detected = True        
                 break
         
         # Symbol Detection for variable declaration
@@ -121,6 +120,7 @@ def lexer(input_file):
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
                 # Check if the next two tokens are HAS A
                 elif ((lookAhead(tokens, i), lookAhead(tokens, i+1))  == (p.IhasA[0], p.IhasA[1])):
@@ -128,6 +128,7 @@ def lexer(input_file):
                     detected = True
                     i+=3
                     detected = False
+                    continue_flag = True
                     break
         
         # For variable initialization
@@ -159,6 +160,7 @@ def lexer(input_file):
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
 
         # For concatenation
@@ -177,12 +179,14 @@ def lexer(input_file):
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
                 elif next_token == p.bothOperators[0]:
                     lexemes.append(Lexeme(tokens[i] + " " + next_token, p.bothOperators[1]))
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
 
         #  For boolean operators 
@@ -193,6 +197,7 @@ def lexer(input_file):
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
 
         # For infinite arity boolean operators    
@@ -203,6 +208,7 @@ def lexer(input_file):
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
 
         # For end of infinite arity boolean operators 
@@ -255,6 +261,7 @@ def lexer(input_file):
                         detected = True
                         i+=2
                         detected = False
+                        continue_flag = True
                     
                 elif symbol[0] == "YA":
                     if next_token == p.yaRly:
@@ -262,6 +269,7 @@ def lexer(input_file):
                         detected = True
                         i+=2
                         detected = False
+                        continue_flag = True
                     
                 elif symbol[0] == "NO":
                     if next_token == p.noWai:
@@ -269,6 +277,7 @@ def lexer(input_file):
                         detected = True
                         i+=2
                         detected = False
+                        continue_flag = True
 
         # For switch case operators  
         for symbol in p.switchCaseOperators:
@@ -295,6 +304,7 @@ def lexer(input_file):
                         detected = True
                         i+=3
                         detected = False
+                        continue_flag = True
                         break
         
         # For loop operators            
@@ -332,6 +342,7 @@ def lexer(input_file):
                     detected = True
                     i+=3
                     detected = False
+                    continue_flag = True
                     break
 
         # For returning values 
@@ -343,9 +354,10 @@ def lexer(input_file):
                     detected = True
                     i+=2
                     detected = False
+                    continue_flag = True
                     break
                 
-        # For exitting functions
+        # For exiting functions
         for symbol in p.exitFunction:
             if tokens[i] == symbol[0]:
                 next_tokens = (lookAhead(tokens, i), lookAhead(tokens, i+1), lookAhead(tokens, i+2))
@@ -354,8 +366,13 @@ def lexer(input_file):
                     detected = True
                     i+=4       
                     detected = False
+                    continue_flag = True
                     break
-
+        
+        if continue_flag:
+            continue
+        
+    
         # For string delimiter
         if tokens[i] == "\"":
             lexemes.append(Lexeme(tokens[i], "String Delimiter"))

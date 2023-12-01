@@ -121,68 +121,232 @@ class Parser:
         statements_node = ParseNode("<statements>", parent=node)
         
         if self.current_tok.keyword != "KTHXBYE":
-            if self.current_tok.keyword in ["OMG", "OMGWTF", "OIC"]:
+            if self.current_tok.keyword in ["OMG", "OMGWTF", "OIC", "IF U SAY SO", "IM OUTTA YR"]:
                 return
             node.children.append(statements_node)
             self.statement(statements_node)
         else:
             return
-        
+    
+    def backtracking(self, node, i):
+        # Traverse parent i times or when the parent is None
+        while i > 0 and node.parent is not None:
+            node = node.parent
+            i -= 1 
+        return node.data
     
     def statement(self, node):
-            try:
-                while self.current_tok.keyword != "KTHXBYE":
-                    statement_node = ParseNode("<statement>", parent=node)
-                    if self.current_tok.token_type == "Identifier":
-                        node.children.append(statement_node)
-                        self.assignment(statement_node)
-                    elif self.current_tok.keyword == "GIMMEH":
-                        node.children.append(statement_node)
-                        self.input(statement_node)
-                    elif self.current_tok.keyword == "VISIBLE":
-                        node.children.append(statement_node)
-                        self.output(statement_node)
-                    elif self.current_tok.keyword == "WTF?":
-                        node.children.append(statement_node)
-                        self.switch(statement_node)
-                    elif node.parent.parent.parent.data == "<switch>":
-                        if self.current_tok.keyword == "OMGWTF":
-                            return
-                        elif self.current_tok.keyword == "OMG":
-                            return
-                        elif self.current_tok.keyword == "OIC":
-                            return
-                        elif self.current_tok.keyword == "GTFO":
-                            node.children.append(statement_node)
-                            statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
-                            self.advance()
-                    # elif self.current_tok.keyword == "IM IN YR":
-                    #     node.children.append(statement_node)
-                    #     self.loop(statement_node)
-                    # elif self.current_tok.keyword == "I IZ":
-                    #     node.children.append(statement_node)
-                    #     self.function_call(statement_node)
-                    else:
-                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
-            except AttributeError:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
-                    
-            return
-    
 
-    # def function_call(self, node):
-    #     function_call_node = ParseNode("<function_call>", parent=node)
-    #     if self.current_tok.keyword == "I IZ":
-    #         node.children.append(function_call_node)
-    #         function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
-    #         self.advance()
-    #         if self.current_tok.token_type == "Identifier":
-    #             function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
-    #             self.advance()
-    #         else:
-    #             raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
-    #     else:
-    #         raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            while self.current_tok.keyword != "KTHXBYE":
+                statement_node = ParseNode("<statement>", parent=node)
+                if self.current_tok.token_type == "Identifier":
+                    node.children.append(statement_node)
+                    self.assignment(statement_node)
+                elif self.current_tok.keyword == "GIMMEH":
+                    node.children.append(statement_node)
+                    self.input(statement_node)
+                elif self.current_tok.keyword == "VISIBLE":
+                    node.children.append(statement_node)
+                    self.output(statement_node)
+                elif self.current_tok.keyword == "WTF?":
+                    node.children.append(statement_node)
+                    self.switch(statement_node)        
+                elif self.current_tok.keyword == "IM IN YR":
+                    node.children.append(statement_node)
+                    self.loop(statement_node)
+                elif self.current_tok.keyword == "HOW IZ I":
+                    node.children.append(statement_node)
+                    self.function(statement_node)
+                elif self.current_tok.keyword == "I IZ":
+                    node.children.append(statement_node)
+                    self.function_call(statement_node)
+                elif self.backtracking(node, 1) == "<function>":
+                    if self.current_tok.keyword == "IF U SAY SO":
+                        return
+                    elif self.current_tok.keyword == "GTFO":
+                        node.children.append(statement_node)
+                        statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
+                        self.advance()
+                    elif self.current_tok.keyword == "FOUND YR":
+                        node.children.append(statement_node)
+                        statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
+                        self.advance()
+                        self.expression(statement_node)
+                elif self.backtracking(node, 1) == "<loop>":
+                    if self.current_tok.keyword == "IM OUTTA YR":
+                        return
+                    elif self.current_tok.keyword == "GTFO":
+                        node.children.append(statement_node)
+                        statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
+                        self.advance()
+                elif self.backtracking(node, 3) == "<switch>":
+                    if self.current_tok.keyword == "OMGWTF":
+                        return
+                    elif self.current_tok.keyword == "OMG":
+                        return
+                    elif self.current_tok.keyword == "OIC":
+                        return
+                    elif self.current_tok.keyword == "GTFO":
+                        node.children.append(statement_node)
+                        statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
+                        self.advance()
+                else:
+                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            return
+        
+    def expression(self, node):
+        expression_node = ParseNode("<expression>", parent=node)
+        # Fake expression
+        if self.current_tok.token_type == "Identifier":
+            node.children.append(expression_node)
+            expression_node.children.append(ParseNode(self.current_tok.keyword, parent=expression_node))
+            self.advance()
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        
+    def function(self, node):
+        function_node = ParseNode("<function>", parent=node)
+        if self.current_tok.keyword == "HOW IZ I":
+            node.children.append(function_node)
+            function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))
+            self.advance()
+            if self.current_tok.token_type == "Identifier":
+                function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))
+                self.advance()
+                if self.current_tok.keyword == "YR":
+                    function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))
+                    self.advance()
+                    self.parameter(function_node)
+                    while self.current_tok.keyword == "AN":
+                        self.more_parameters(function_node)
+                self.statements(function_node)
+                if self.current_tok.keyword == "IF U SAY SO":
+                    function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))
+                    self.advance()
+            else:
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
+    def parameter(self, node):
+        parameter_node = ParseNode("<parameter>", parent=node)
+        if self.current_tok.token_type == "Identifier":
+            node.children.append(parameter_node)
+            parameter_node.children.append(ParseNode(self.current_tok.keyword, parent=parameter_node))
+            self.advance()
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
+    def more_parameters(self, node):
+        more_parameters_node = ParseNode("<more_parameters>", parent=node)
+        if self.current_tok.keyword == "AN":
+            node.children.append(more_parameters_node)
+            more_parameters_node.children.append(ParseNode(self.current_tok.keyword, parent=more_parameters_node))
+            self.advance()
+            if self.current_tok.keyword == "YR":
+                more_parameters_node.children.append(ParseNode(self.current_tok.keyword, parent=more_parameters_node))
+                self.advance()
+                self.parameter(more_parameters_node)
+            else:
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
+    def function_call(self, node):
+        function_call_node = ParseNode("<function_call>", parent=node)
+        if self.current_tok.keyword == "I IZ":
+            node.children.append(function_call_node)
+            function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
+            self.advance()
+            if self.current_tok.token_type == "Identifier":
+                function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
+                self.advance()
+                if self.current_tok.keyword == "YR":
+                    function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
+                    self.advance()
+                    self.argument(function_call_node)
+                    while self.current_tok.keyword == "AN":
+                        self.more_arguments(function_call_node)
+                if self.current_tok.keyword == "MKAY":
+                    function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
+                    self.advance()    
+            else:
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        
+    def argument(self, node):
+        argument_node = ParseNode("<argument>", parent=node)
+        node.children.append(argument_node)
+        self.expression(argument_node)
+    
+    def more_arguments(self, node):
+        more_arguments_node = ParseNode("<more_arguments>", parent=node)
+        if self.current_tok.keyword == "AN":
+            node.children.append(more_arguments_node)
+            more_arguments_node.children.append(ParseNode(self.current_tok.keyword, parent=more_arguments_node))
+            self.advance()
+            if self.current_tok.keyword == "YR":
+                more_arguments_node.children.append(ParseNode(self.current_tok.keyword, parent=more_arguments_node))
+                self.advance()
+                self.argument(more_arguments_node)
+            else:
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")  
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")      
+
+    def loop(self, node):
+        loop_node = ParseNode("<loop>", parent=node)
+
+        if self.current_tok.keyword == "IM IN YR":
+            node.children.append(loop_node)
+            loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+            self.advance()
+
+            if self.current_tok.token_type != "Identifier":
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            else:
+                loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                self.advance()
+
+                if not (self.current_tok.keyword in ["UPPIN", "NERFIN"]):
+                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                else:
+                    loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                    self.advance()
+
+                    if self.current_tok.keyword != "YR":
+                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                    else: 
+                        loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                        self.advance()
+
+                        if self.current_tok.token_type != "Identifier":
+                            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                        else:    
+                            loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                            self.advance()
+
+                            if not (self.current_tok.keyword in ["TIL", "WILE"]):
+                                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                            else:
+                                loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                                self.advance()
+                                self.expression(loop_node)
+                                self.statements(loop_node)
+                                
+                                if self.current_tok.keyword != "IM OUTTA YR":
+                                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                                else:
+                                    loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                                    self.advance()
+                                    
+                                    if self.current_tok.token_type != "Identifier":
+                                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                                    else:
+                                        loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
+                                        self.advance()
+            
 
     def switch(self, node):
         switch_node = ParseNode("<switch>", parent=node)
