@@ -192,6 +192,10 @@ def lexer(input_file):
         #  For boolean operators 
         for symbol in p.booleanOperators:
             if tokens[i] == symbol[0]:
+                if (tokens[i] == "NOT"):
+                    lexemes.append(Lexeme(tokens[i], symbol[1]))
+                    detected = True
+                    break
                 if (lookAhead(tokens, i) == p.booleanOperatorsOf):
                     lexemes.append(Lexeme(tokens[i] + " " + lookAhead(tokens, i), symbol[1]))
                     detected = True

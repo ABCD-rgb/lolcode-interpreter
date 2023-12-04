@@ -2,7 +2,7 @@ import patterns as p
 import lexer as l
 
 
-lexemes = l.lexer("parser_test.lol")
+lexemes = l.lexer("parser_test2.lol")
 # print(lexemes)
 
 class ParseNode:
@@ -128,6 +128,12 @@ class Parser:
         else:
             return
     
+    def lookAhead(self, i):
+        if self.tok_idx + i < len(self.tokens):
+            return self.tokens[self.tok_idx + i]
+        else:
+            return None
+    
     def backtracking(self, node, i):
         # Traverse parent i times or when the parent is None
         while i > 0 and node.parent is not None:
@@ -139,7 +145,7 @@ class Parser:
 
             while self.current_tok.keyword != "KTHXBYE":
                 statement_node = ParseNode("<statement>", parent=node)
-                if self.current_tok.token_type == "Identifier":
+                if self.current_tok.token_type == "Identifier" and self.lookAhead(1) is not None and self.lookAhead(1).keyword == "R":
                     node.children.append(statement_node)
                     self.assignment(statement_node)
                 elif self.current_tok.keyword == "GIMMEH":
@@ -191,19 +197,171 @@ class Parser:
                         statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
                         self.advance()
                 else:
-                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                    node.children.append(statement_node)
+                    self.expression(statement_node)
+                # else:
+                #     raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
             return
         
     def expression(self, node):
         expression_node = ParseNode("<expression>", parent=node)
-        # Fake expression
-        if self.current_tok.token_type == "Identifier":
-            node.children.append(expression_node)
-            expression_node.children.append(ParseNode(self.current_tok.keyword, parent=expression_node))
-            self.advance()
+        arithmeticExpressions = ["SUM OF", "DIFF OF", "PRODUKT OF", "QUOSHUNT OF", "MOD OF", "BIGGR OF", "SMALLR OF"]
+        booleanExpressions = ["BOTH OF", "EITHER OF", "WON OF", "NOT", "ALL OF", "ANY OF"]
+        comparisonExpressions = ["BOTH SAEM", "DIFFRINT"]
+        # <arithmetic>
+        if self.current_tok.keyword in arithmeticExpressions:
+            self.arithmetic(expression_node)
+        # <concatenation>
+        elif self.current_tok.keyword == "SMOOSH":
+            self.concatenation(expression_node)
+        # <boolean>
+        elif self.current_tok.keyword in booleanExpressions:
+            self.boolean(expression_node)
+        # <comparison>
+        elif self.current_tok.keyword in comparisonExpressions:
+            self.comparison(expression_node)
+        # Typecasting
+        elif self.current_tok.keyword == "MAEK":
+            self.typecasting(expression_node)
+        # Recasting
+        elif self.current_tok.token_type == "Identifier":
+            self.recasting(expression_node)
+        # function call
+        elif self.current_tok.keyword == "I IZ":
+            self.function_call(expression_node)
         else:
             raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
         
+        # Append the expression node to the parent node
+        node.children.append(expression_node)
+
+    def comparison(self, node):
+        comparison_node = ParseNode("<comparison>", parent=node)
+        if self.current_tok.keyword in ["BOTH SAEM", "DIFFRINT"]:
+            node.children.append(comparison_node)
+            comparison_node.children.append(ParseNode(self.current_tok.keyword, parent=comparison_node))
+            self.advance()
+            self.value(comparison_node)
+            if self.current_tok.keyword == "AN":
+                comparison_node.children.append(ParseNode(self.current_tok.keyword, parent=comparison_node))
+                self.advance()
+                relationalOperations = ["BIGGR OF", "SMALLR OF"]
+                if self.current_tok.keyword in relationalOperations:
+                    comparison_node.children.append(ParseNode(self.current_tok.keyword, parent=comparison_node))
+                    self.advance()
+                    self.value(comparison_node)
+                    if self.current_tok.keyword == "AN":
+                        comparison_node.children.append(ParseNode(self.current_tok.keyword, parent=comparison_node))
+                        self.advance()
+                        self.value(comparison_node)
+                else: 
+                    self.value(comparison_node)
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
+    def boolean(self, node):
+        boolean_node = ParseNode("<boolean>", parent=node)
+        binaryBoolean = ["BOTH OF", "EITHER OF", "WON OF"]
+        unaryBoolean = ["NOT"]
+        infiniteBoolean = ["ALL OF", "ANY OF"]
+        if self.current_tok.keyword in  binaryBoolean:
+            node.children.append(boolean_node)
+            boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
+            self.advance()
+            self.value(boolean_node)
+            if self.current_tok.keyword == "AN":
+                boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
+                self.advance()
+                self.value(boolean_node)
+        elif self.current_tok.keyword in unaryBoolean:
+            node.children.append(boolean_node)
+            boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
+            self.advance()
+            self.value(boolean_node)
+        elif self.current_tok.keyword in infiniteBoolean:
+            node.children.append(boolean_node)
+            boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
+            self.advance()
+            self.value(boolean_node)
+            while self.current_tok.keyword == "AN":
+                boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
+                self.advance()
+                self.value(boolean_node)
+            if self.current_tok.keyword == "MKAY":
+                boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
+                self.advance()
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
+    def typecasting(self, node):
+        typecasting_node = ParseNode("<typecasting>", parent=node)
+
+        if self.current_tok.keyword == "MAEK":
+            node.children.append(typecasting_node)
+            typecasting_node.children.append(ParseNode(self.current_tok.keyword, parent=typecasting_node))
+            self.advance()
+            self.value(typecasting_node)
+
+            # Optional A
+            if self.current_tok.keyword == "A":
+                typecasting_node.children.append(ParseNode(self.current_tok.keyword, parent=typecasting_node))
+                self.advance()
+            
+            if self.current_tok.token_type == "TYPE Literal":
+                typecasting_node.children.append(ParseNode(self.current_tok.keyword, parent=typecasting_node))
+                self.advance()
+            else:
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
+    # Just like assignment using R         
+    def recasting(self, node):
+        recasting_node = ParseNode("<recasting>", parent=node)
+        
+        if self.current_tok.token_type == "Identifier":
+            node.children.append(recasting_node)
+            recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
+            self.advance()
+            if self.current_tok.keyword == "IS NOW A":
+                recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
+                self.advance()
+                if self.current_tok.token_type == "TYPE Literal":
+                    recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
+                    self.advance()
+                else:
+                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            else: 
+                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        
+
+    def concatenation(self, node):
+        concatenation_node = ParseNode("<concatenation>", parent=node)
+        if self.current_tok.keyword == "SMOOSH":
+            node.children.append(concatenation_node)
+            concatenation_node.children.append(ParseNode(self.current_tok.keyword, parent=concatenation_node))
+            self.advance()
+            self.value(concatenation_node)
+            while self.current_tok.keyword == "AN":
+                concatenation_node.children.append(ParseNode(self.current_tok.keyword, parent=concatenation_node))
+                self.advance()
+                self.value(concatenation_node)
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+    
+    def arithmetic(self, expression_node: ParseNode):
+        arithmeticNode = ParseNode("<arithmetic>", parent=expression_node)
+        
+        # <arithmetic> -> <value> <arithmetic_operator> <value> for any arithmetic operator
+        expression_node.children.append(arithmeticNode)
+        arithmeticNode.children.append(ParseNode(self.current_tok.keyword, parent=arithmeticNode))
+        self.advance()
+        self.value(arithmeticNode)
+        if self.current_tok.keyword == "AN":
+            arithmeticNode.children.append(ParseNode(self.current_tok.keyword, parent=arithmeticNode))
+            self.advance()
+            self.value(arithmeticNode)
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+
     def function(self, node):
         function_node = ParseNode("<function>", parent=node)
         if self.current_tok.keyword == "HOW IZ I":
@@ -411,9 +569,11 @@ class Parser:
         elif self.current_tok.token_type in ["String Delimiter", "NUMBR Literal", "NUMBAR Literal", "TROOF Literal", "TYPE Literal"]:
             node.children.append(value_node)
             self.literal(value_node)
-        # === TODO: Add support for expressions
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            node.children.append(value_node)
+            self.expression(value_node)
+        # else:
+        #     raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
     
     def literal(self, node):
         literal_node = ParseNode("<literal>", parent=node)
