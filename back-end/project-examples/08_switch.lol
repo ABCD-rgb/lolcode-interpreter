@@ -12,7 +12,6 @@ HAI
 	VISIBLE "Choice: "
 	GIMMEH choice
 
-	choice
 	WTF?
 		OMG 1
 			VISIBLE "Enter birth year: "

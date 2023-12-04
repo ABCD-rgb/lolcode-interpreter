@@ -1,26 +1,38 @@
 HAI
     WAZZUP
-        I HAS A var ITZ "TEST"
-        I HAS A var2
-        I HAS A var4 ITZ var
+	I HAS A choice
+	I HAS A input
     BUHBYE
+	BTW if w/o MEBBE, 1 only, everything else is invalid
+	VISIBLE "1. Compute age"
+	VISIBLE "2. Compute tip"
+	VISIBLE "3. Compute square area"
+	VISIBLE "0. Exit"
 
-    SUM OF 2 AN 4
-    DIFF OF 4 AN 3.14
-    PRODUKT OF SUM OF 1 AN 2 AN "7"
-    QUOSHUNT OF 5 AN "12"
-    MOD OF 3 AN 3.14
-    SMOOSH var AN var4 AN "Hi"
+	VISIBLE "Choice: "
+	GIMMEH choice
 
-    MAEK var A NUMBAR
-    number R MAEK number YARN
-    number IS NOW A NUMBAR
 
-    BOTH OF x AN y
-    EITHER OF x1 AN y1
-    NOT x2
-    ALL OF NOT x AN BOTH OF y AN z AN EITHER OF x AN y MKAY
+	WTF?
+		OMG 1
+			VISIBLE "Enter birth year: "
+			GIMMEH input
+			VISIBLE DIFF OF 2022 AN input
+			GTFO
+		OMG 2
+			VISIBLE "Enter bill cost: " !
+			GIMMEH input
+			VISIBLE "Tip: " + PRODUKT OF input AN 0.1
+			GTFO
+		OMG 3
+			VISIBLE "Enter width: "
+			GIMMEH input
+			VISIBLE "Square Area: " + PRODUKT OF input AN input
+			GTFO
+		OMG 0
+			VISIBLE "Goodbye"
+		OMGWTF
+			VISIBLE "Invalid Input!"
+	OIC
 
-    DIFFRINT x AN y
-    BOTH SAEM x AN BIGGR OF x AN xyz
 KTHXBYE

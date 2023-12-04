@@ -382,6 +382,16 @@ def lexer(input_file):
             lexemes.append(Lexeme(tokens[i], "String Delimiter"))
             detected = True
 
+        # For visible concatenation
+        if tokens[i] == "+":
+            lexemes.append(Lexeme(tokens[i], "Visible Concatenation Symbol"))
+            detected = True
+
+        # For newline suppression
+        if tokens[i] == "!":
+            lexemes.append(Lexeme(tokens[i], "Newline Suppression Symbol"))
+            detected = True
+
         # Literals
         if not detected:
             # Check if numbr
@@ -428,7 +438,8 @@ def lexer(input_file):
     return lexemes
             
             
-
+def main():
+    pass
     
 
 if __name__ == "__main__":
