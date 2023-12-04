@@ -167,7 +167,6 @@ class Parser:
                     node.children.append(statement_node)
                     self.function_call(statement_node)
                 elif self.backtracking(node, 1) == "<function>":
-                    print(1)
                     if self.current_tok.keyword == "IF U SAY SO":
                         return
                     elif self.current_tok.keyword == "GTFO":
@@ -180,7 +179,6 @@ class Parser:
                         self.advance()
                         self.expression(statement_node)
                 elif self.backtracking(node, 1) == "<loop>":
-                    print(2)
                     if self.current_tok.keyword == "IM OUTTA YR":
                         return
                     elif self.current_tok.keyword == "GTFO":
@@ -204,16 +202,15 @@ class Parser:
                         raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
 
                 elif self.backtracking(node, 2) == "<if-then>":
-                    print(4)
-                    print(f"Current token: {self.current_tok.keyword}: {self.current_tok.token_type}")
                     if self.current_tok.keyword == "OIC":
+                        return
+                    elif self.current_tok.keyword == "MEBBE":
                         return
                     elif self.current_tok.keyword == "NO WAI":
                         return
                     else:
                         raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
                 else:
-                    print(f"Current token: {self.current_tok.keyword}: {self.current_tok.token_type}")
                     node.children.append(statement_node)
                     self.expression(statement_node)
                 # else:
@@ -232,29 +229,41 @@ class Parser:
         # <concatenation>
         elif self.current_tok.keyword == "SMOOSH":
             self.concatenation(expression_node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
         # <boolean>
         elif self.current_tok.keyword in booleanExpressions:
             self.boolean(expression_node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
         # <comparison>
         elif self.current_tok.keyword in comparisonExpressions:
             self.comparison(expression_node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
         # Typecasting
         elif self.current_tok.keyword == "MAEK":
             self.typecasting(expression_node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
         # Recasting
         elif self.current_tok.token_type == "Identifier":
             self.recasting(expression_node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
         # function call
         elif self.current_tok.keyword == "I IZ":
             self.function_call(expression_node)
-        elif self.current_tok.keyword == "O RLY?" and node.data == "<statement>": 
-            if_then_flag = True           
-            self.if_then(expression_node, node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
         else:
             raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
         
         if not if_then_flag:
             node.children.append(expression_node)
+        else:
+            self.if_then(expression_node, node)            
+        
             
             
     def if_then(self, expression_node, parent_node):
@@ -262,15 +271,17 @@ class Parser:
         parent_node.children.append(if_then_node)
         if_then_node.children.append(expression_node)
         
-        self.advance()
-        if self.current_tok.keyword == "YA RLY":
-            self.if_clause(if_then_node)
-            if self.current_tok.keyword == "OIC":
-                if_then_node.children.append(ParseNode(self.current_tok.keyword, parent=if_then_node))
-                self.advance()
-                return
-            else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        if self.current_tok.keyword == "O RLY?":
+            if_then_node.children.append(ParseNode(self.current_tok.keyword, parent=if_then_node))
+            self.advance()
+            if self.current_tok.keyword == "YA RLY":
+                self.if_clause(if_then_node)
+                if self.current_tok.keyword == "OIC":
+                    if_then_node.children.append(ParseNode(self.current_tok.keyword, parent=if_then_node))
+                    self.advance()
+                    return
+                else:
+                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
     
     def if_clause(self, node):
         if_clause_node = ParseNode("<if-clause>", parent=node)
@@ -279,14 +290,24 @@ class Parser:
             if_clause_node.children.append(ParseNode(self.current_tok.keyword, parent=if_clause_node))
             self.advance()
             self.statements(if_clause_node)
-            # if self.current_tok.keyword == "MEBBE":
-            #     self.else_if_clause(node)
+            while self.current_tok.keyword == "MEBBE":
+                self.else_if_clause(node)
             if self.current_tok.keyword == "NO WAI":
                 self.else_clause(node)
         else:
             raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
         
     # TODO: add support for MEBBE
+    def else_if_clause(self, node):
+        else_if_clause_node = ParseNode("<else-if-clause>", parent=node)
+        if self.current_tok.keyword == "MEBBE":
+            node.children.append(else_if_clause_node)
+            else_if_clause_node.children.append(ParseNode(self.current_tok.keyword, parent=else_if_clause_node))
+            self.advance()
+            self.expression(else_if_clause_node)
+            self.statements(else_if_clause_node)
+        else:
+            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
     
     def else_clause(self, node):
         else_clause_node = ParseNode("<else-clause>", parent=node)
@@ -700,142 +721,6 @@ class Parser:
                 raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
 
        
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.keyword == "WAZZUP":
-    #             return self.wazzup(curr_node)
-    #         elif self.current_tok.keyword == "KTHXBYE":
-    #             curr_node.children.append(ParseNode(self.current_tok,parent=curr_node))
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return self.parse_tree
-    
-    # def wazzup(self, node):
-    #     tok = self.current_tok
-    #     if tok.keyword == "WAZZUP":
-    #         new_node = ParseNode(tok,parent=node)
-    #         node.children.append(new_node)
-    #         self.advance()
-            
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.keyword == "I HAS A":
-    #             return self.variable_declaration(new_node)
-    #         else:
-    #             raise Exception("Invalid token")
-            
-    #     elif tok.keyword == "BUHBYE":
-    #         node.next_sibling = ParseNode(tok)
-    #         self.advance()
-            
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.keyword == "KTHXBYE":
-    #             return self.kthxbye(node.next_sibling)
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return node
-    
-    # def variable_declaration(self, node):
-    #     tok = self.current_tok
-    #     if tok.keyword == "I HAS A":
-    #         new_node = ParseNode(tok,parent=node)
-    #         node.children.append(new_node)
-    #         self.advance()
-            
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.token_type == "Identifier":
-    #             return self.identifier(new_node)
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return node
-    
-    # def i_has_a(self, node):
-    #     tok = self.current_tok
-    #     if tok.keyword == "I HAS A":
-    #         new_node = ParseNode(tok,parent=node)
-    #         node.children.append(new_node)
-    #         self.advance()
-            
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.token_type == "Identifier":
-    #             return self.identifier(new_node)
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return node
-    
-    
-    # def identifier(self, node):
-    #     tok = self.current_tok
-    #     if tok.token_type == "Identifier":
-    #         new_node = ParseNode(tok,parent=node)
-    #         node.children.append(new_node)
-    #         self.advance()
-            
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.keyword == "ITZ":
-    #             return self.itz(new_node)
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return node
-    
-    # def itz(self, node):
-    #     tok = self.current_tok
-    #     if tok.keyword == "ITZ":
-    #         new_node = ParseNode(tok,parent=node)
-    #         node.children.append(new_node)
-    #         self.advance()
-            
-    #         # If the next token is a variable declaration
-    #         if self.current_tok.token_type in ["YARN Literal", "NUMBR Literal", "NUMBAR Literal", "TROOF Literal", "TYPE Literal"]:
-    #             return self.literal(new_node)
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return node
-    
-    # def literal(self, node):
-    #     tok = self.current_tok
-    #     if tok.token_type in ["YARN Literal", "NUMBR Literal", "NUMBAR Literal", "TROOF Literal", "TYPE Literal"]:
-    #         new_node = ParseNode(tok,parent=node)
-    #         node.children.append(new_node)
-    #         self.advance()
-    #         # Check if the next token is another I HAS A or BUHBYE
-    #         if self.current_tok.keyword == "I HAS A":
-    #             return self.i_has_a(node.next_sibling)
-    #         elif self.current_tok.keyword == "KTHXBYE":
-    #             return self.kthxbye(node.next_sibling)
-    #         else:
-    #             raise Exception("Invalid token")
-    #     else:
-    #         raise Exception("Invalid token")
-        
-    #     return node
-    
-    # def kthxbye(self, node):
-    #     tok = self.current_tok
-    #     if tok.keyword == "KTHXBYE":
-    #         # return the tree
-    #         node.next_sibling = ParseNode(tok)
-    #         return node
-    
-        
-    
-    
     
 if __name__ == "__main__":
     p = Parser(lexemes)
