@@ -1,8 +1,10 @@
 HAI
 
     WAZZUP
-	I HAS A choice
-	I HAS A input
+	I HAS A choice ITZ "String"
+	I HAS A input ITZ 5.5
+	I HAS A bool ITZ WIN
+	I HAS A x
     BUHBYE
 
 	BTW if w/o MEBBE, 1 only, everything else is invalid
@@ -41,7 +43,7 @@ HAI
 	DIFFRINT BIGGR OF 3 AN choice AN 3
 	O RLY?
 		YA RLY
-			VISIBLE "Invalid input is > 3."
+			VISIBLE "Invalid input is > 3." !
 	OIC
 
 KTHXBYE

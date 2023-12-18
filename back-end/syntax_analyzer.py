@@ -2,7 +2,7 @@ import patterns as p
 import lexer as l
 
 
-lexemes = l.lexer("parser_test2.lol")
+lexemes = l.lexer("test.lol")
 # print(lexemes)
 
 class ParseNode:
@@ -646,9 +646,12 @@ class Parser:
     
     def value(self, node):
         value_node = ParseNode("<value>", parent=node)
+
         if self.current_tok.token_type in ["Identifier"]:
             node.children.append(value_node)
-            value_node.children.append(ParseNode(self.current_tok.keyword, parent=value_node))
+            type_node = ParseNode("<identifier>", parent=value_node)
+            value_node.children.append(type_node)
+            type_node.children.append(ParseNode(self.current_tok.keyword, parent=type_node))
             self.advance()
         elif self.current_tok.token_type in ["String Delimiter", "NUMBR Literal", "NUMBAR Literal", "TROOF Literal", "TYPE Literal"]:
             node.children.append(value_node)
@@ -661,17 +664,31 @@ class Parser:
     
     def literal(self, node):
         literal_node = ParseNode("<literal>", parent=node)
+
+        typeDict = {
+            "NUMBR Literal" : "<NUMBR>",
+            "NUMBAR Literal" : "<NUMBAR>",
+            "TROOF Literal" : "<TROOF>",
+            "TYPE Literal": "<TYPE>"
+        }
+
+        # <NUMBR> , <NUMBAR>, <TROOF>, <TYPE>
         if self.current_tok.token_type in ["NUMBR Literal", "NUMBAR Literal", "TROOF Literal", "TYPE Literal"]:
             node.children.append(literal_node)
-            literal_node.children.append(ParseNode(self.current_tok.keyword, parent=literal_node))
+            type_node = ParseNode(typeDict[self.current_tok.token_type], parent=literal_node)
+            literal_node.children.append(type_node)
+            type_node.children.append(ParseNode(self.current_tok.keyword, parent=type_node))
             self.advance()
+        # <STRING>
         elif self.current_tok.token_type in ["String Delimiter"]:
             node.children.append(literal_node)
-            literal_node.children.append(ParseNode(self.current_tok.keyword, parent=literal_node))
+            type_node = ParseNode("<STRING>", parent=literal_node)
+            literal_node.children.append(type_node)
+            type_node.children.append(ParseNode(self.current_tok.keyword, parent=type_node))
             self.advance()
-            literal_node.children.append(ParseNode(self.current_tok.keyword, parent=literal_node))
+            type_node.children.append(ParseNode(self.current_tok.keyword, parent=type_node))
             self.advance()
-            literal_node.children.append(ParseNode(self.current_tok.keyword, parent=literal_node))
+            type_node.children.append(ParseNode(self.current_tok.keyword, parent=type_node))
             self.advance()
         else:
             raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
