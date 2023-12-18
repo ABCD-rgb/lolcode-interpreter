@@ -145,14 +145,14 @@ class Interpreter:
     
     def interpret_DeclarationsNode(self, node: ParseNode):
         symbol_name = node.children[1].data
+        # Check if symbol_name is in the symbol table already, raise error if it is
+        if symbol_name in self.symbolTable.variables:
+            raise Exception("Error: Variable '" + symbol_name + "' is already defined in this scope") 
+        
         if len(node.children) == 4:
             symbol_value = self.interpret_ValueNode(node.children[3])
-            # Check if symbol_value is in the symbol table already, raise error if it is
-            if symbol_value in self.symbolTable.variables:
-                raise Exception("Variable " + symbol_value + " already exists") 
         else:
             symbol_value = None
-        
         
         self.symbolTable.add_variable(symbol_name, symbol_value)
             
@@ -194,6 +194,27 @@ class Interpreter:
             self.interpret_InputNode(statement_node)
         elif statement_node.data == "<output>":
             self.interpret_OutputNode(statement_node)
+        elif statement_node.data == "<expression>":
+            self.interpret_ExpressionNode(statement_node)
+        elif statement_node.data == "<assignment>":
+            # TODO: self.interpret_AssignmentNode(statement_node)
+            pass
+        elif statement_node.data == "<switch>":
+            # TODO: self.interpret_SwitchNode(statement_node)
+            pass
+        elif statement_node.data == "<loop>":
+            # TODO: self.interpret_LoopNode(statement_node)
+            pass
+        elif statement_node.data == "<function>":
+            # TODO: self.interpret_FunctionNode(statement_node)
+            pass
+        elif statement_node.data == "<function call>":
+            # TODO: self.interpret_FunctionCallNode(statement_node)
+            pass
+        else:
+            # TODO: raise error
+            pass
+            
 
     def interpret_InputNode(self, node: ParseNode):
         symbol_name = node.children[1].data
@@ -201,14 +222,13 @@ class Interpreter:
         self.symbolTable.add_variable(symbol_name, symbol_value)
         
     def interpret_OutputNode(self, node: ParseNode):
-        # Each operand is seperated by a + sign
-        # Each operand is a <value> node
         
         operands = []
         newLine = True
         
-        # print("CURRENT NODE: " + str(node))
         for child in node.children:
+            # Each operand is seperated by a + sign
+            # Each operand is a <value> node
             if child.data == "<value>":
                 operands.append(self.interpret_ValueNode(child))
             if child.data == "!":
@@ -221,17 +241,39 @@ class Interpreter:
             print()
             
 
-                
-        
-    # expressions
-        # arithmetic
-        # boolean
-        # comparison
-        # typecasting
-        # recasting
-        # function call
-        
-        
+    def interpret_ExpressionNode(self, node: ParseNode):
+        expression_node = node.children[0] 
+
+        if expression_node.data == "<arithmetic>":   
+            self.interpret_ArithmeticNode(expression_node)
+            pass
+        elif expression_node.data == "<concatenation>":
+            # TODO: self.interpret_ConcatenationNode(expression_node)
+            pass
+        elif expression_node.data == "<boolean>":
+            # TODO: self.interpret_BooleanNode(expression_node)
+            pass
+        elif expression_node.data == "<comparison>":
+            # TODO: self.interpret_ComparisonNode(expression_node)
+            pass
+        elif expression_node.data == "<typecasting>":
+            # TODO: self.interpret_TypecastingNode(expression_node)
+            pass
+        elif expression_node.data == "<recasting>":
+            # TODO: self.interpret_RecastingNode(expression_node)
+            pass
+        elif expression_node.data == "<function_call>":
+            # TODO: self.interpret_FunctionCallNode(expression_node)
+            pass
+        else:
+            # TODO: raise error
+            pass
+    
+    # ==== ARITHMETIC operations ====
+    def interpret_ArithmeticNode(self, node: ParseNode):
+        for child in node.children:
+            print(child.data)
+    # ==== END ARITHMETIC operations ====
                 
     
     

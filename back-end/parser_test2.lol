@@ -7,6 +7,9 @@ HAI
 	I HAS A x
     BUHBYE
 
+	DIFF OF 4 AN 3.14
+	SUM OF SUM OF SUM OF 3 AN 4 AN 2 AN 1
+
 	BTW if w/o MEBBE, 1 only, everything else is invalid
 	VISIBLE "1. Compute age"
 	VISIBLE "2. Compute tip"

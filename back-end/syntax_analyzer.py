@@ -2,7 +2,7 @@ import patterns as p
 import lexer as l
 
 
-lexemes = l.lexer("test.lol")
+lexemes = l.lexer("parser_test2.lol")
 # print(lexemes)
 
 class ParseNode:
