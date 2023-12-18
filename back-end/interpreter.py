@@ -53,6 +53,48 @@ class SymbolTable:
     def get_current_function(self):
         return self.current_function
     
+    def print_symbol_table(self):
+        symbol_table = ""
+        symbol_table += "=== SYMBOL TABLE ===\n"
+
+        symbol_table += "Variables: \n"
+        if len(self.variables) == 0:
+            symbol_table += "\tEMPTY\n"
+        else:
+            for key, value in self.variables.items():
+                symbol_table += "\t| " + key + " | " + str(value) + " |\n"
+        symbol_table += "Functions: \n"
+        if len(self.functions) == 0:
+            symbol_table += "\tEMPTY\n"
+        else:
+            for key, value in self.functions.items():
+                symbol_table += "\t| " + key + " | " + str(value) + " |\n"
+        symbol_table += "Call Stack: \n"
+        if len(self.call_stack) == 0:
+            symbol_table += "\tEMPTY\n"
+        else:
+            for value in self.call_stack:
+                symbol_table += "\t| " + str(value) + " |\n"
+        symbol_table += "Loop Stack: \n"
+        if len(self.loop_stack) == 0:
+            symbol_table += "\tEMPTY\n"
+        else:
+            for value in self.loop_stack:
+                symbol_table += "\t| " + str(value) + " |\n"
+        symbol_table += "Return Stack: \n"
+        if len(self.return_stack) == 0:
+            symbol_table += "\tEMPTY\n"
+        else:
+            for value in self.return_stack:
+                symbol_table += "\t| " + str(value) + " |\n"
+        symbol_table += "Current Function: \n"
+        if self.current_function == None:
+            symbol_table += "\tEMPTY\n"
+        else:
+            symbol_table += "\t| " + str(self.current_function) + " |\n"
+        symbol_table += "====================\n"
+        print(symbol_table)
+    
     def __str__(self):
         return "SymbolTable: " + str(self.variables) + ", " + str(self.functions) + ", " + str(self.call_stack) + ", " + str(self.loop_stack) + ", " + str(self.return_stack) + ", " + str(self.current_function)
     
@@ -205,7 +247,8 @@ def main():
     tree = parser.parse()
     interpreter = Interpreter(tree, symbols)
     interpreter.interpret()
-    print(symbols)
+    # print(symbols)
+    symbols.print_symbol_table()
     
 if __name__ == '__main__':
     main()
