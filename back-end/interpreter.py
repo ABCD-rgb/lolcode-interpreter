@@ -167,6 +167,8 @@ class Interpreter:
                 return self.interpret_LiteralNode(child)
             elif child_type == "<identifier>":
                 return self.interpret_IdentifierNode(child)
+            elif child_type == "<expression>":
+                return self.interpret_ExpressionNode(child)
     
         return node.data
     
@@ -197,7 +199,7 @@ class Interpreter:
         elif statement_node.data == "<expression>":
             self.interpret_ExpressionNode(statement_node)
         elif statement_node.data == "<assignment>":
-            # TODO: self.interpret_AssignmentNode(statement_node)
+            self.interpret_AssignmentNode(statement_node)
             pass
         elif statement_node.data == "<switch>":
             # TODO: self.interpret_SwitchNode(statement_node)
@@ -214,6 +216,15 @@ class Interpreter:
         else:
             # TODO: raise error
             pass
+        
+    def interpret_AssignmentNode(self, node: ParseNode):
+        symbol_name = node.children[0].data
+        symbol_value = self.interpret_ValueNode(node.children[2])
+        # Get the value in the symbol table to check if it exists
+        if self.symbolTable.get_variable(symbol_name) != None:
+            self.symbolTable.add_variable(symbol_name, symbol_value)
+        else:
+            raise Exception("Error: Variable '" + symbol_name + "' is not defined in this scope")
             
 
     def interpret_InputNode(self, node: ParseNode):
@@ -240,15 +251,31 @@ class Interpreter:
         if newLine:
             print()
             
-
+    def backtracking(self, node: ParseNode, data: str):
+        # Find the first parent node with the given data or return None
+        while node.data != data:
+            node = node.parent
+            if node == None:
+                return None
+        return node
+    
+        
     def interpret_ExpressionNode(self, node: ParseNode):
         expression_node = node.children[0] 
 
         if expression_node.data == "<arithmetic>":   
-            self.interpret_ArithmeticNode(expression_node)
-            pass
+            value = self.interpret_ArithmeticNode(expression_node)
+            # Store to IT
+            checkAssignment = self.backtracking(expression_node, "<assignment>")
+            checkDeclar = self.backtracking(expression_node, "<declaration>")
+            if checkAssignment == None:
+                self.symbolTable.add_variable("IT", value)
+            return value
         elif expression_node.data == "<concatenation>":
             # TODO: self.interpret_ConcatenationNode(expression_node)
+            value = self.interpret_ConcatenationNode(expression_node)
+            # Store to IT
+            self.symbolTable.add_variable("IT", value)
             pass
         elif expression_node.data == "<boolean>":
             # TODO: self.interpret_BooleanNode(expression_node)
@@ -293,14 +320,17 @@ class Interpreter:
         right_type = right.children[0].data # <literal> or <identifier> or <expression>
 
         # get value of left and right
-        if left_type == "<expression>":
-            left_value = self.interpret_ArithmeticNode(left.children[0].children[0])
-        elif left_type != "<expression>":
-            left_value = self.interpret_ValueNode(left)
-        if right_type == "<expression>":
-            left_value = self.interpret_ArithmeticNode(right.children[0].children[0])
-        elif right_type != "<expression>":
-            right_value = self.interpret_ValueNode(right)
+        # if left_type == "<expression>":
+        #     left_value = self.interpret_ArithmeticNode(left.children[0].children[0])
+        # elif left_type != "<expression>":
+        #     left_value = self.interpret_ValueNode(left)
+        # if right_type == "<expression>":
+        #     right_value = self.interpret_ArithmeticNode(right.children[0].children[0])
+        # elif right_type != "<expression>":
+        #     right_value = self.interpret_ValueNode(right)
+        left_value = self.interpret_ValueNode(left)
+        right_value = self.interpret_ValueNode(right)
+
         
         # check type and implicitly cast if necessary
         left_value = self.arithmetic_value_check(left_value)
@@ -315,28 +345,47 @@ class Interpreter:
             print(left_value - right_value)
             return left_value - right_value
         elif operator == "PRODUKT OF":
+            print(left_value * right_value)
             return left_value * right_value
         elif operator == "QUOSHUNT OF":
+            # Division by zero error    
+            if right_value == 0:
+                raise Exception("Division by Zero Error: Cannot divide by zero")
+            print(left_value / right_value)
             return left_value / right_value
         elif operator == "MOD OF":
+            print(left_value % right_value)
             return left_value % right_value
         elif operator == "BIGGR OF":
+            print(max(left_value, right_value))
             return max(left_value, right_value)
         elif operator == "SMALLR OF":
+            print(min(left_value, right_value))
             return min(left_value, right_value)
-        else:
-            # TODO: raise Exception("Unknown operator: " + operator)
-            # TODO: hindi ba nacacatch na to sa syntax_analyzer (?)
-            pass
     # ==== END ARITHMETIC operations ====
                 
-    
-    
-    
-        
-        
-        
-def main():
+    def interpret_ConcatenationNode(self, node: ParseNode):
+        # children value can be of any data type but will be typecast to yarns
+        # array of strings to be concatenated
+        strings = []
+
+        for children in node.children:
+            if children.data == "<value>":
+                value = str(self.interpret_ValueNode(children))
+                
+                if value == "True":
+                    value = "WIN"
+                elif value == "False":
+                    value = "FAIL"
+
+                strings.append(value)
+
+        value = ''.join(strings)
+
+        print(value)
+        return value    
+
+def main():        
     symbols = SymbolTable()
     symbols.add_variable("IT", None)
     lexemes = lexer("test.lol")
