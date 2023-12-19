@@ -272,14 +272,15 @@ class Interpreter:
                 self.symbolTable.add_variable("IT", value)
             return value
         elif expression_node.data == "<concatenation>":
-            # TODO: self.interpret_ConcatenationNode(expression_node)
             value = self.interpret_ConcatenationNode(expression_node)
             # Store to IT
             self.symbolTable.add_variable("IT", value)
-            pass
+            return value
         elif expression_node.data == "<boolean>":
-            # TODO: self.interpret_BooleanNode(expression_node)
-            pass
+            value = self.interpret_BooleanNode(expression_node)
+            # Store to IT
+            self.symbolTable.add_variable("IT", value)
+            return value
         elif expression_node.data == "<comparison>":
             # TODO: self.interpret_ComparisonNode(expression_node)
             pass
@@ -363,16 +364,17 @@ class Interpreter:
             print(min(left_value, right_value))
             return min(left_value, right_value)
     # ==== END ARITHMETIC operations ====
-                
+    
+    # ==== CONCATENATION operations ====
     def interpret_ConcatenationNode(self, node: ParseNode):
-        # children value can be of any data type but will be typecast to yarns
         # array of strings to be concatenated
         strings = []
 
+        # children value can be of any data type but will be typecast to yarns
         for children in node.children:
             if children.data == "<value>":
                 value = str(self.interpret_ValueNode(children))
-                
+                # TROOF interepted literals are WIN or FAIL
                 if value == "True":
                     value = "WIN"
                 elif value == "False":
@@ -384,6 +386,68 @@ class Interpreter:
 
         print(value)
         return value    
+    # ==== END CONCATENATION operations ====
+
+    # ==== BOOLEAN operations ====
+    # type checking (must be TROOF)
+    def boolean_value_check(self, value):
+        false_values = [0, 0.0, "", None, "FAIL"]
+        if value not in false_values:
+            value = True
+        else:
+            value = False
+        return value
+
+    def interpret_BooleanNode(self, node: ParseNode):
+        # children value can be of any data type but will be typecast to TROOF
+        # array of strings to be concatenated
+        print(node.data)
+        operator = node.children[0].data
+
+        print(operator)
+        # finite; two operands
+        if operator != "ALL OF" and operator != "ANY OF" and operator != "NOT":
+            left_value = self.interpret_ValueNode(node.children[1])     # <value>
+            right_value = self.interpret_ValueNode(node.children[3])    # <value>
+            print(left_value, right_value) 
+
+            # check type and implicitly cast if necessary (must be TROOF)
+            left_value = self.boolean_value_check(left_value)
+            right_value = self.boolean_value_check(right_value)
+
+            if operator == "BOTH OF":       # AND
+                print(operator, left_value and right_value)
+                return (left_value and right_value)
+            elif operator == "EITHER OF":   # OR
+                print(operator, (left_value or right_value))
+                return (left_value or right_value)
+            elif operator == "WON OF":      # XOR
+                print(operator, (left_value ^ right_value))
+                return (left_value ^ right_value)
+        # finite; one operand
+        elif operator == "NOT":
+            only_value = self.interpret_ValueNode(node.children[1])
+            # check type and implicitly cast if necessary (must be TROOF)
+            only_value = self.boolean_value_check(only_value)
+            print(operator, (not only_value))
+            return (not only_value)
+        # infinite
+        else:
+            values = []
+            for children in node.children:
+                if children.data == "<value>":
+                    value = self.interpret_ValueNode(children)
+                    # check type and implicitly cast if necessary (must be TROOF)
+                    value = self.boolean_value_check(value)
+                    values.append(value)
+            
+            if operator == "ALL OF":    # infinite arity AND
+                print(operator, all(values))
+                return all(values)
+            elif operator == "ANY OF":  # infinite arity OR
+                print(operator, any(values))
+                return any(values)
+    # ==== END BOOLEAN operations ====
 
 def main():        
     symbols = SymbolTable()
