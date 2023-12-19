@@ -9,8 +9,8 @@ HAI
         I HAS A flag ITZ WIN
     BUHBYE
     
-    DIFF OF "4" AN 3.14
-    BTW SUM OF SUM OF SUM OF 3 AN 4 AN 2 AN 1
+    BTW DIFF OF "4" AN 3.14
+    DIFF OF SUM OF 3 AN 4 AN 2
 
     BTW GIMMEH monde
     BTW GIMMEH some
