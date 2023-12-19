@@ -270,9 +270,62 @@ class Interpreter:
             pass
     
     # ==== ARITHMETIC operations ====
+    # type checking (must be NUMBR or NUMBAR)
+    def arithmetic_value_check(self, value):
+        # if not NUMBR OR NUMBAR, explicitly cast to NUMBR OR NUMBAR
+        # if cannot be caster to NUMBR OR NUMBAR, raise error
+        if (type(value) == str):
+            try:
+                # TODO: determine if should be typecasted to int or float (currently FLOAT always)
+                value = float(value)
+            except:
+                raise Exception(f"Typecast Error: '{value}' cannot be casted to NUMBR or NUMBAR")
+        return value
+    
+
     def interpret_ArithmeticNode(self, node: ParseNode):
-        for child in node.children:
-            print(child.data)
+        # children value can be a constant, an identifier, or another arithmetic expression
+        operator = node.children[0].data
+        left = node.children[1]
+        right = node.children[3]
+        # print(operator, left, right)
+        
+        left_type = left.children[0].data
+        right_type = right.children[0].data
+        # <value> is <literal> or <identifier>
+        if (left_type != "<expression>") and (right_type != "<expression>"):
+            left_value = self.interpret_ValueNode(left)
+            right_value = self.interpret_ValueNode(right)
+            # check type and implicitly cast if necessary
+            left_value = self.arithmetic_value_check(left_value)
+            right_value = self.arithmetic_value_check(right_value)
+            print(operator)
+            if operator == "SUM OF":
+                print(left_value + right_value)
+                return left_value + right_value
+            elif operator == "DIFF OF":
+                print(left_value - right_value)
+                return left_value - right_value
+            elif operator == "PRODUKT OF":
+                return left_value * right_value
+            elif operator == "QUOSHUNT OF":
+                return left_value / right_value
+            elif operator == "MOD OF":
+                return left_value % right_value
+            elif operator == "BIGGR OF":
+                return max(left_value, right_value)
+            elif operator == "SMALLR OF":
+                return min(left_value, right_value)
+            else:
+                # TODO: raise Exception("Unknown operator: " + operator)
+                # TODO: hindi ba nacacatch na to sa syntax_analyzer (?)
+                pass
+        elif left_type == "<expression>" or right_type == "<expression>":
+            # TODO: enable nested arithmetic expressions
+            pass
+        else:
+            # TODO: raise exception
+            pass
     # ==== END ARITHMETIC operations ====
                 
     

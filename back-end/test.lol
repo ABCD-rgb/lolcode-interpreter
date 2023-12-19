@@ -9,17 +9,18 @@ HAI
         I HAS A flag ITZ WIN
     BUHBYE
     
-    DIFF OF 4 AN 3.14
+    DIFF OF "4" AN 3.14
+    BTW SUM OF SUM OF SUM OF 3 AN 4 AN 2 AN 1
 
-    GIMMEH monde
-    GIMMEH some
+    BTW GIMMEH monde
+    BTW GIMMEH some
 
     VISIBLE "Hi " + "Hello " + "Bye " 
     VISIBLE "Hello " + "Hello " + "Bye " 
 
     
     VISIBLE "declarations " !
-    VISIBLE monde BTW should be NOOB
+    BTW VISIBLE monde BTW should be NOOB
     VISIBLE num 
     VISIBLE name 
     VISIBLE fnum ! 
