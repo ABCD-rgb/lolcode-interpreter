@@ -282,10 +282,13 @@ class Interpreter:
             self.symbolTable.add_variable("IT", value)
             return value
         elif expression_node.data == "<comparison>":
-            # TODO: self.interpret_ComparisonNode(expression_node)
-            pass
+            value = self.interpret_ComparisonNode(expression_node)
+            # Store to IT
+            self.symbolTable.add_variable("IT", value)
+            return value
         elif expression_node.data == "<typecasting>":
             # TODO: self.interpret_TypecastingNode(expression_node)
+            self.interpret_TypecastingNode(expression_node)
             pass
         elif expression_node.data == "<recasting>":
             # TODO: self.interpret_RecastingNode(expression_node)
@@ -448,6 +451,120 @@ class Interpreter:
                 print(operator, any(values))
                 return any(values)
     # ==== END BOOLEAN operations ====
+            
+
+    # ==== COMPARISON operations ====
+    def interpret_ComparisonNode(self, node: ParseNode):
+        # NUMBR or NUMBAR only
+
+        # comparison operations
+        if len(node.children) == 4:
+            print(">>> comparison operations")
+            operator = node.children[0].data
+            left_value = self.interpret_ValueNode(node.children[1])
+            right_value = self.interpret_ValueNode(node.children[3])
+
+            # check type (no automatic typecasting)
+            if type(left_value) != int and type(left_value) != float:
+                raise Exception(f"Type Error: '{left_value}' is not a NUMBR or NUMBAR")
+            if type(right_value) != int and type(right_value) != float:
+                raise Exception(f"Type Error: '{right_value}' is not a NUMBR or NUMBAR")
+
+            if operator == "BOTH SAEM":
+                print(operator, (left_value == right_value))
+                return (left_value == right_value)
+            elif operator == "DIFFRINT":
+                print(operator, (left_value != right_value))
+                return (left_value != right_value)
+        # relational operations
+        else :
+            print(">>> relational operations")
+            operator = node.children[0].data
+            operator2 = node.children[3].data
+            left_value = self.interpret_ValueNode(node.children[1])
+            left_value2 = self.interpret_ValueNode(node.children[4])
+            right_value = self.interpret_ValueNode(node.children[6])
+
+            # check type (no automatic typecasting)
+            if type(left_value) != int and type(left_value) != float:
+                raise Exception(f"Type Error: '{left_value}' is not a NUMBR or NUMBAR")
+            if type(right_value) != int and type(right_value) != float:
+                raise Exception(f"Type Error: '{right_value}' is not a NUMBR or NUMBAR")
+            # left_value should have the same value as left_value2
+            if left_value != left_value2:
+                raise Exception(f"Type Error: '{left_value}' is not equal to '{left_value2}'")
+            
+            if operator == "BOTH SAEM":
+                if operator2 == "BIGGR OF":
+                    print(operator, (left_value >= right_value))
+                    return (left_value >= right_value)
+                elif operator2 == "SMALLR OF":
+                    print(operator, (left_value <= right_value))
+                    return (left_value <= right_value)
+            elif operator == "DIFFRINT":
+                if operator2 == "BIGGR OF":
+                    print(operator, (left_value < right_value))
+                    return (left_value < right_value)
+                elif operator2 == "SMALLR OF":
+                    print(operator, (left_value > right_value))
+                    return (left_value > right_value)
+    # ==== END COMPARISON operations ====
+                
+
+    # ==== TYPECASTING operations ====
+    def interpret_TypecastingNode(self, node: ParseNode):
+        # NOOB 
+            # NOOBs can be implicitly typecast into TROOF (implicit typecasting to any other types will result in an error)
+            # Explicit typecasting of NOOBs is allowed and will result to zero/empty values
+        # TROOF
+            # Empty string ("") and numerical zero -- cast to  FAIL
+            # All other values, except those mentioned above are cast to WIN
+            # Casting WIN to numeric -- 1 or 1.0s
+            # Casting FAIL to numberic -- 0
+        # NUMBAR
+            # Casting NUMBAR to NUMBR -- truncate the decimal point of the NUMBAR
+            # Casting NUMBAR to YARN -- will truncate the decimal portion up to two decimal places
+        # NUMBR
+            # Casting NUMBR to NUMBAR -- convert value into floating point. (value should be retained)
+            # Casting NUMBR to YARN -- convert the value into a string of characters
+        # YARN 
+            # YARN can be successfully cast into a NUMBAR or NUMBR if YARN does not contain non-numerical, non-hyphen, nom-period characters
+        
+        print(node.data)
+        
+        # using MAEK operator only modifies the resulting value and not the variable involved
+        if node.children[0].data == "MAEK":
+            only_value = self.interpret_ValueNode(node.children[1])
+            # syntax may be: (1) MAEK var1 A NUMBAR or (2) MAEK var1 A NUMBR
+            if node.children[2].data == "A":
+                typecast_type = node.children[3].data
+            else:
+                typecast_type = node.children[2].data
+
+            # TODO: no support for NOOB yet
+            if typecast_type == "TROOF":
+                if not only_value:
+                    print("FAIL")
+                    return False
+                else:
+                    print("WIN")
+                    return True
+            elif typecast_type == "NUMBAR":
+                try:
+                    print(float(only_value))
+                    return float(only_value)
+                except:
+                    raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBAR")
+            elif typecast_type == "NUMBR":
+                try:
+                    print(int(only_value))
+                    return int(only_value)
+                except:
+                    raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBR")
+            elif typecast_type == "YARN":
+                print(str(only_value))
+                return str(round(only_value, 2))
+    # ==== END TYPECASTING operations ====
 
 def main():        
     symbols = SymbolTable()

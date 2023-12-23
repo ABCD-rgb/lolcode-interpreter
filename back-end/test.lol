@@ -9,7 +9,17 @@ HAI
         I HAS A flag ITZ WIN
     BUHBYE
 
-    BOTH OF flag AN ""
+    BTW number R MAEK number YARN
+    MAEK num YARN
+
+    BTW should work (part of typecasting & recasting)
+    BTW I HAS A number ITZ 17
+
+    BTW BOTH SAEM 2 AN 2
+    BTW DIFFRINT 2 AN 2
+    BTW BOTH SAEM 12 AN BIGGR OF 12 AN 12.1
+
+    BTW BOTH OF flag AN ""
     BTW NOT FAIL
     BTW ALL OF NOT WIN AN BOTH OF WIN AN FAIL AN EITHER OF WIN AN WIN MKAY
 
