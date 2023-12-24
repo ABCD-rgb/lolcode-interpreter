@@ -9,6 +9,16 @@ HAI
         I HAS A flag ITZ WIN
     BUHBYE
 
+    VISIBLE "Hi " + "Hello " + "Bye " 
+    VISIBLE "Hello " + "Hello " + "Bye " 
+
+    VISIBLE "declarations " !
+    BTW VISIBLE monde BTW should be NOOB
+    VISIBLE num 
+    VISIBLE name 
+    VISIBLE fnum ! 
+    VISIBLE flag !
+
     SMOOSH "THIS" AN "THAT" AN "THOSE"
     SMOOSH DIFF OF 3 AN 4 AN PRODUKT OF 5 AN 6
     SMOOSH WIN AN FAIL
@@ -38,19 +48,10 @@ HAI
     BTW GIMMEH monde
     BTW GIMMEH some
 
-
-    VISIBLE "Hi " + "Hello " + "Bye " 
-    VISIBLE "Hello " + "Hello " + "Bye " 
-
-    
-    VISIBLE "declarations " !
-    BTW VISIBLE monde BTW should be NOOB
-    VISIBLE num 
-    VISIBLE name 
-    VISIBLE fnum ! 
-    VISIBLE flag !
-
     num R SUM OF 1 AN 2
 
 KTHXBYE
+
+
+
 
