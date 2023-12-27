@@ -62,6 +62,8 @@ class InterpreterGUI:
 
         # get the lexemes
         self.lexemes = lexer(self.file_path)
+        # clear symbol table
+        self.symbols = SymbolTable()
         self.parser = Parser(self.lexemes)
         self.tree = self.parser.parse()
         self.interpreter = Interpreter(self.tree, self.symbols)
@@ -73,10 +75,16 @@ class InterpreterGUI:
         self.populate_symbol_table()
 
     def populate_lexemes_table(self):
+        # clear the contents of the table before inserting
+        self.lexemes_table.clear_table()
+
         for lexeme in self.lexemes:
             self.lexemes_table.insert("", "end", values=(lexeme.keyword, lexeme.token_type))
 
     def populate_symbol_table(self):
+        # clear the contents of the table before inserting
+        self.symbol_table.clear_table()
+
         for identifier in self.variables.items():
             self.symbol_table.insert("", "end", values=identifier)
 
@@ -120,6 +128,14 @@ class InterpreterGUI:
         table_frame.grid_rowconfigure(0, weight=1)
         table_frame.grid_columnconfigure(0, weight=1)
 
+        # To delete previous contents of the table
+        def clear_table():
+            table.delete(*table.get_children())
+
+        # attach the clear table method to the table object
+        table.clear_table = clear_table
+
+        # return the table frame and table
         return table_frame, table
 
 if __name__ == "__main__":

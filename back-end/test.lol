@@ -7,6 +7,8 @@ HAI
         I HAS A name ITZ "seventeen"
         I HAS A fnum ITZ 17.0
         I HAS A flag ITZ WIN
+	I HAS A mamon ITZ "sixteen"
+	I HAS A cup ITZ "you hehe"
     BUHBYE
 
     VISIBLE "Hi " + "Hello " + "Bye " 
@@ -51,6 +53,11 @@ HAI
     num R SUM OF 1 AN 2
 
 KTHXBYE
+
+
+
+
+
 
 
 
