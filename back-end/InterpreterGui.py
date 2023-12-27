@@ -40,7 +40,11 @@ class InterpreterGUI:
 
         # Execute Button
         self.execute_button = tk.Button(root, text="Execute", command=self.execute_code)
-        self.execute_button.grid(row=2, column=0, pady=2)
+        self.execute_button.grid(row=2, column=1, pady=2)
+
+        # View parse tree button
+        self.view_tree_button = tk.Button(root, text="View Parse Tree", command=self.view_parse_tree)
+        self.view_tree_button.grid(row=2, column=2, pady=2)
 
         # Console
         self.console = scrolledtext.ScrolledText(root, width=80, height=20)
@@ -53,6 +57,11 @@ class InterpreterGUI:
         root.grid_columnconfigure(0, weight=1)
         root.grid_columnconfigure(1, weight=1)
         root.grid_columnconfigure(2, weight=1)
+
+    def view_parse_tree(self):
+        # create a new top-level window
+        parse_tree_window = tk.Toplevel(self.root)
+        parse_tree_window.title("Parse Tree")
 
 
     def execute_code(self):
