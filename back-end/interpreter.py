@@ -288,8 +288,9 @@ class Interpreter:
             return value
         elif expression_node.data == "<typecasting>":
             # TODO: self.interpret_TypecastingNode(expression_node)
-            self.interpret_TypecastingNode(expression_node)
-            pass
+            value = self.interpret_TypecastingNode(expression_node)
+            self.symbolTable.add_variable("IT", value)
+            return value
         elif expression_node.data == "<recasting>":
             # TODO: self.interpret_RecastingNode(expression_node)
             pass
