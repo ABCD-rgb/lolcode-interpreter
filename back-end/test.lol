@@ -7,10 +7,24 @@ HAI
         I HAS A name ITZ "seventeen"
         I HAS A fnum ITZ 17.0
         I HAS A flag ITZ WIN
+	I HAS A mamon ITZ "sixteen"
+	I HAS A cup ITZ "you hehe"
     BUHBYE
 
-    BTW number R MAEK number YARN
-    MAEK num YARN
+    VISIBLE "Hi " + "Hello " + "Bye " 
+    VISIBLE "Hello " + "Hello " + "Bye " 
+
+    VISIBLE "declarations " !
+    BTW VISIBLE monde BTW should be NOOB
+    VISIBLE num 
+    VISIBLE name 
+    VISIBLE fnum ! 
+    VISIBLE flag !
+
+    SMOOSH "THIS" AN "THAT" AN "THOSE"
+    SMOOSH DIFF OF 3 AN 4 AN PRODUKT OF 5 AN 6
+    SMOOSH WIN AN FAIL
+    SMOOSH 3 AN 4
 
     BTW should work (part of typecasting & recasting)
     BTW I HAS A number ITZ 17
@@ -23,10 +37,10 @@ HAI
     BTW NOT FAIL
     BTW ALL OF NOT WIN AN BOTH OF WIN AN FAIL AN EITHER OF WIN AN WIN MKAY
 
-    BTW SMOOSH "THIS" AN "THAT" AN "THOSE"
-    BTW SMOOSH DIFF OF 3 AN 4 AN PRODUKT OF 5 AN 6
-    BTW SMOOSH WIN AN FAIL
-    BTW SMOOSH 3 AN 4
+    SMOOSH "THIS" AN "THAT" AN "THOSE"
+    SMOOSH DIFF OF 3 AN 4 AN PRODUKT OF 5 AN 6
+    SMOOSH WIN AN FAIL
+    SMOOSH 3 AN 4
 
     
     BTW DIFF OF "4" AN 3.14
@@ -53,18 +67,16 @@ HAI
     BTW GIMMEH monde
     BTW GIMMEH some
 
-
-    VISIBLE "Hi " + "Hello " + "Bye " 
-    VISIBLE "Hello " + "Hello " + "Bye " 
-
-    
-    VISIBLE "declarations " !
-    BTW VISIBLE monde BTW should be NOOB
-    VISIBLE num 
-    VISIBLE name 
-    VISIBLE fnum ! 
-    VISIBLE flag !
-
     num R SUM OF 1 AN 2
 
 KTHXBYE
+
+
+
+
+
+
+
+
+
+
