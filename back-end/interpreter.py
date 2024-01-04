@@ -252,14 +252,35 @@ class Interpreter:
                        
 
     def interpret_IfThenNode(self, node: ParseNode):
+        # expression_value = self.interpret_ExpressionNode(node.children[0])
+        # self.symbolTable.add_variable("IT", expression_value)
+        # if_clause = node.children[2]
+        # else_clause = node.children[3]
+        # if expression_value:
+        #     self.interpret_StatementsNode(if_clause.children[1])
+        # else:
+        #     self.interpret_StatementsNode(else_clause.children[1])
         expression_value = self.interpret_ExpressionNode(node.children[0])
         self.symbolTable.add_variable("IT", expression_value)
         if_clause = node.children[2]
-        else_clause = node.children[3]
+        elif_clauses = [node.children[i] for i in range(3, len(node.children) - 2)]
+        else_clause = node.children[-2]
+        noMatch = True
+        # if expression is true, execute statements
         if expression_value:
             self.interpret_StatementsNode(if_clause.children[1])
+        # if expression is false, check elif clauses
         else:
-            self.interpret_StatementsNode(else_clause.children[1])
+            for elif_clause in elif_clauses:
+                # if expression is true, execute statements and break
+                if self.interpret_ExpressionNode(elif_clause.children[1]):
+                    self.interpret_StatementsNode(elif_clause.children[2])
+                    noMatch = False
+                    break
+            # if no elif clause is true, execute else clause
+            if noMatch:
+                self.interpret_StatementsNode(else_clause.children[1])
+        
                 
     
     def interpret_StatementsNode(self, node: ParseNode):
