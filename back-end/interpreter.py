@@ -15,13 +15,23 @@ class SymbolTable:
         self.variables[name] = value
         
     def get_variable(self, name):
-        try:
-            to_ret = self.variables[name]
-        except KeyError:
-            print("Variable " + name + " not found")
-            to_ret = None
+        # List all valid variable names
+        valid_names = list(self.variables.keys())
         
-        return to_ret
+        # Check if name is in the list of valid names
+        if name in valid_names:
+            return self.variables[name]
+        else:
+            # If name is not in the list of valid names, check if it is a function
+            if name in self.functions:
+                return self.functions[name]
+            else:
+                # If name is not in the list of valid names and is not a function, check if it is a keyword
+                if name == "IT":
+                    return self.variables[name]
+                else:
+                    # If name is not in the list of valid names, is not a function, and is not a keyword, raise an error
+                    raise Exception("Error: Variable '" + name + "' is not defined in this scope")
     
     def add_function(self, name, value):
         self.functions[name] = value
@@ -62,7 +72,7 @@ class SymbolTable:
             symbol_table += "\tEMPTY\n"
         else:
             for key, value in self.variables.items():
-                symbol_table += "\t| " + key + " | " + str(value) + " |\n"
+                symbol_table += "\t| " + key + " | " + str(value) + " | " + str(type(value)) + " |\n"
         symbol_table += "Functions: \n"
         if len(self.functions) == 0:
             symbol_table += "\tEMPTY\n"
@@ -200,12 +210,14 @@ class Interpreter:
             self.interpret_ExpressionNode(statement_node)
         elif statement_node.data == "<assignment>":
             self.interpret_AssignmentNode(statement_node)
-            pass
         elif statement_node.data == "<switch>":
-            # TODO: self.interpret_SwitchNode(statement_node)
-            pass
+            self.interpret_SwitchCaseNode(statement_node)
         elif statement_node.data == "<loop>":
             # TODO: self.interpret_LoopNode(statement_node)
+            pass
+        elif statement_node.data == "<if-then>":
+            self.interpret_IfThenNode(statement_node)
+            # TODO: self.interpret_IfThenNode(statement_node)
             pass
         elif statement_node.data == "<function>":
             # TODO: self.interpret_FunctionNode(statement_node)
@@ -216,7 +228,46 @@ class Interpreter:
         else:
             # TODO: raise error
             pass
+
+
+    def interpret_SwitchCaseNode(self, node: ParseNode):
+        it_value = self.symbolTable.get_variable("IT")
+        print(f"HI: {node.children[0].data}")
+        cases = node.children[1].children
+        default_case = None
+        cases_list = {}
+        for case in cases:
+            if case.data == "<case>":
+                case_key = self.interpret_LiteralNode(case.children[1])
+                case_body = case.children[2]
+                cases_list[case_key] = case_body
+            elif case.data == "<default>":  
+                default_case= case.children[1]
+        if it_value in cases_list:
+            gtfo_flag = self.interpret_StatementsNode(cases_list[it_value])        
         
+        if gtfo_flag:
+            return
+        self.interpret_StatementsNode(default_case)
+                       
+
+    def interpret_IfThenNode(self, node: ParseNode):
+        expression_value = self.interpret_ExpressionNode(node.children[0])
+        self.symbolTable.add_variable("IT", expression_value)
+        if_clause = node.children[2]
+        else_clause = node.children[3]
+        if expression_value:
+            self.interpret_StatementsNode(if_clause.children[1])
+        else:
+            self.interpret_StatementsNode(else_clause.children[1])
+                
+    
+    def interpret_StatementsNode(self, node: ParseNode):
+        for child in node.children:
+            if child.children[0].data == "GTFO":
+                return True
+            self.interpret_StatementNode(child)
+    
     def interpret_AssignmentNode(self, node: ParseNode):
         symbol_name = node.children[0].data
         symbol_value = self.interpret_ValueNode(node.children[2])
@@ -287,13 +338,12 @@ class Interpreter:
             self.symbolTable.add_variable("IT", value)
             return value
         elif expression_node.data == "<typecasting>":
-            # TODO: self.interpret_TypecastingNode(expression_node)
             value = self.interpret_TypecastingNode(expression_node)
             self.symbolTable.add_variable("IT", value)
             return value
         elif expression_node.data == "<recasting>":
-            # TODO: self.interpret_RecastingNode(expression_node)
-            pass
+            value = self.interpret_RecastingNode(expression_node)
+            return value
         elif expression_node.data == "<function_call>":
             # TODO: self.interpret_FunctionCallNode(expression_node)
             pass
@@ -542,8 +592,9 @@ class Interpreter:
             else:
                 typecast_type = node.children[2].data
 
-            # TODO: no support for NOOB yet
-            if typecast_type == "TROOF":
+            if typecast_type == "NOOB":
+                raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NOOB")
+            elif typecast_type == "TROOF":
                 if not only_value:
                     print("FAIL")
                     return False
@@ -552,20 +603,127 @@ class Interpreter:
                     return True
             elif typecast_type == "NUMBAR":
                 try:
-                    print(float(only_value))
-                    return float(only_value)
+                    if only_value == None:
+                        return 0.0
+                    else:
+                        print(float(only_value))
+                        return float(only_value)
                 except:
                     raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBAR")
             elif typecast_type == "NUMBR":
                 try:
-                    print(int(only_value))
-                    return int(only_value)
+                    if only_value == None:
+                        return 0
+                    else:
+                        print(int(only_value))
+                        return int(only_value)
                 except:
                     raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBR")
             elif typecast_type == "YARN":
-                print(str(only_value))
-                return str(round(only_value, 2))
+                if only_value == None:
+                    return ""
+                elif type(only_value) == str:
+                    print(str(only_value))
+                    return str(only_value)
+                elif type(only_value) == int or type(only_value) == float:
+                    print(str(round(only_value, 2)))
+                    return str(round(only_value, 2))
+                elif type(only_value) == bool:
+                    if only_value:
+                        print("WIN")
+                        return "WIN"
+                    else:
+                        print("FAIL")
+                        return "FAIL"
+
+                
+
+
+
+
+    def interpret_RecastingNode(self, node: ParseNode):
+        # NOOB 
+            # NOOBs can be implicitly typecast into TROOF (implicit typecasting to any other types will result in an error)
+            # Explicit typecasting of NOOBs is allowed and will result to zero/empty values
+        # TROOF
+            # Empty string ("") and numerical zero -- cast to  FAIL
+            # All other values, except those mentioned above are cast to WIN
+            # Casting WIN to numeric -- 1 or 1.0s
+            # Casting FAIL to numberic -- 0
+        # NUMBAR
+            # Casting NUMBAR to NUMBR -- truncate the decimal point of the NUMBAR
+            # Casting NUMBAR to YARN -- will truncate the decimal portion up to two decimal places
+        # NUMBR
+            # Casting NUMBR to NUMBAR -- convert value into floating point. (value should be retained)
+            # Casting NUMBR to YARN -- convert the value into a string of characters
+        # YARN 
+            # YARN can be successfully cast into a NUMBAR or NUMBR if YARN does not contain non-numerical, non-hyphen, nom-period characters
+        
+        print(node.data)
+        
+        # using MAEK operator only modifies the resulting value and not the variable involved
+        print(node.children[1].data)
+        if node.children[1].data == "IS NOW A":
+            variable_name = node.children[0].children[0].children[0].data
+            
+            only_value = self.interpret_ValueNode(node.children[0])
+            print(f"ONLY VALUE: {only_value}")
+            # syntax may be: number IS NOW A NUMBAR BTW number is NUMBAR type now (17.0)
+            typecast_type = node.children[2].data
+            
+            if typecast_type == "NOOB":
+                raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NOOB")
+            elif typecast_type == "TROOF":
+                if not only_value:
+                    print("FAIL")
+                    self.symbolTable.add_variable(variable_name, False)
+                    return self.symbolTable.get_variable(variable_name)
+                else:
+                    self.symbolTable.add_variable(variable_name, True)
+                    print("WIN")
+                    return self.symbolTable.get_variable(variable_name)
+            elif typecast_type == "NUMBAR":
+                try:
+                    if only_value == None:
+                        self.symbolTable.add_variable(variable_name, 0.0)
+                        return self.symbolTable.get_variable(variable_name)
+                    else:
+                        self.symbolTable.add_variable(variable_name, float(only_value))
+                        return self.symbolTable.get_variable(variable_name)
+                except:
+                    raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NUMBAR")
+            elif typecast_type == "NUMBR":
+                try:
+                    if only_value == None:
+                        self.symbolTable.add_variable(variable_name, 0)
+                        return self.symbolTable.get_variable(variable_name)
+                    else:
+                        print(f"NUMBR: {only_value}")
+                        self.symbolTable.add_variable(variable_name, int(only_value))
+                        return self.symbolTable.get_variable(variable_name)
+                except:
+                    raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NUMBR")
+            elif typecast_type == "YARN":
+                if only_value == None:
+                    self.symbolTable.add_variable(variable_name, "")
+                    return self.symbolTable.get_variable(variable_name)
+                
+                # If decimal (NUMBAR) round to 2 decimal places
+                if type(only_value) == float:
+                    only_value = round(only_value, 2)
+                
+                if type(only_value) == bool:
+                    if only_value:
+                        only_value = "WIN"
+                    else:
+                        only_value = "FAIL"
+                        
+                self.symbolTable.add_variable(variable_name, str(only_value))
+                return self.symbolTable.get_variable(variable_name)
+    
     # ==== END TYPECASTING operations ====
+    
+    
 
 def main():        
     symbols = SymbolTable()

@@ -403,8 +403,9 @@ class Parser:
         
         if self.current_tok.token_type == "Identifier":
             node.children.append(recasting_node)
-            recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
-            self.advance()
+            # recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
+            # self.advance()
+            self.value(recasting_node)
             if self.current_tok.keyword == "IS NOW A":
                 recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
                 self.advance()
@@ -520,7 +521,7 @@ class Parser:
     def argument(self, node):
         argument_node = ParseNode("<argument>", parent=node)
         node.children.append(argument_node)
-        self.expression(argument_node)
+        self.value(argument_node)
     
     def more_arguments(self, node):
         more_arguments_node = ParseNode("<more_arguments>", parent=node)

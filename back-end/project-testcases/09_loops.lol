@@ -1,8 +1,9 @@
 HAI
-
-	I HAS A num1
-	I HAS A num2
-
+	WAZZUP
+		I HAS A num1
+		I HAS A num2
+	BUHBYE
+	
 	VISIBLE "Gimmeh a number: "
 	GIMMEH num1
 

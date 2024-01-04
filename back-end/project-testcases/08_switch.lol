@@ -1,8 +1,9 @@
 HAI
-
-	I HAS A choice
-	I HAS A input
-
+	WAZZUP
+		I HAS A choice
+		I HAS A input
+	BUHBYE
+	
 	BTW if w/o MEBBE, 1 only, everything else is invalid
 	VISIBLE "1. Compute age"
 	VISIBLE "2. Compute tip"
@@ -12,6 +13,7 @@ HAI
 	VISIBLE "Choice: "
 	GIMMEH choice
 
+	choice
 	WTF?
 		OMG 1
 			VISIBLE "Enter birth year: "

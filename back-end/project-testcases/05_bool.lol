@@ -1,8 +1,10 @@
 HAI
-    BTW variable dec
-    I HAS A x
-    I HAS A y
-    
+    WAZZUP
+        BTW variable dec
+        I HAS A x
+        I HAS A y
+    BUHBYE
+
     VISIBLE "x:" WIN ", y:" WIN
     x R WIN
     y R WIN

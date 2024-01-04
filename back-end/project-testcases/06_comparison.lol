@@ -1,6 +1,8 @@
 HAI
-    I HAS A x
-    I HAS A y
+    WAZZUP
+        I HAS A x
+        I HAS A y
+    BUHBYE
     
     VISIBLE "Value 1: "
     GIMMEH x

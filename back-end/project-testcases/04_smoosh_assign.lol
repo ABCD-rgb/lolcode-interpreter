@@ -1,7 +1,9 @@
 HAI
-    BTW variable dec
-    I HAS A x
-    I HAS A y
+    WAZZUP
+        BTW variable dec
+        I HAS A x
+        I HAS A y
+    BUHBYE
     
     VISIBLE "Hello! Please enter two strings:"
     VISIBLE "String 1: "

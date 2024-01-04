@@ -1,7 +1,8 @@
 HAI
-
-	I HAS A choice
-	I HAS A input
+	WAZZUP
+		I HAS A choice
+		I HAS A input
+	BUHBYE
 
 	BTW if w/o MEBBE, 1 only, everything else is invalid
 	VISIBLE "1. Compute age"
@@ -25,11 +26,11 @@ OBTW
 		MEBBE BOTH SAEM choice AN 2
 			VISIBLE "Enter bill cost: "
 			GIMMEH input
-			VISIBLE "Tip: " PRODUCKT OF input AN 0.1
+			VISIBLE "Tip: " PRODUKT OF input AN 0.1
 		MEBBE BOTH SAEM choice AN 3
 			VISIBLE "Enter width: "
 			GIMMEH input
-			VISIBLE "Square Area: " PRODUCKT OF input AN input
+			VISIBLE "Square Area: " PRODUKT OF input AN input
 		MEBBE BOTH SAEM choice AN 0
 			VISIBLE "Goodbye"
 TLDR

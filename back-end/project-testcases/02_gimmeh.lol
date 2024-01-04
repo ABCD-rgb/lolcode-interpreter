@@ -1,8 +1,10 @@
 HAI
-    BTW variable dec
-    I HAS A monde
-    I HAS A num ITZ 17
-    
+    WAZZUP
+        BTW variable dec
+        I HAS A monde
+        I HAS A num ITZ 17
+    BUHBYE
+
     GIMMEH monde
 
     VISIBLE SUM OF monde AN num
