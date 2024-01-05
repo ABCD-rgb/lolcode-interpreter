@@ -1,15 +1,61 @@
+HOW IZ I printName YR person
+    VISIBLE "Hello, " + person
+    GTFO
+IF U SAY SO
+
 HAI
+
+    HOW IZ I addNum YR x AN YR y
+        I IZ printName YR x MKAY
+        FOUND YR SUM OF x AN y
+    IF U SAY SO
+
     WAZZUP
         BTW variable dec
         I HAS A monde
         I HAS A some
-        I HAS A num ITZ 17
+        I HAS A num ITZ 2
+        I HAS A num2 ITZ 3
         I HAS A name ITZ "seventeen"
-        I HAS A fnum ITZ 17.0
+        I HAS A fnum ITZ 5
         I HAS A flag ITZ WIN
 	I HAS A mamon ITZ "sixteen"
 	I HAS A cup ITZ "you hehe"
     BUHBYE
+
+
+
+
+
+    I IZ addNum YR num AN YR num2 MKAY
+    BTW I IZ printName YR "qwertyu" MKAY
+
+
+OBTW
+    BOTH SAEM num AN 1
+    O RLY?
+		YA RLY
+			VISIBLE "Enter birth year: "
+			GIMMEH input
+			VISIBLE DIFF OF 2022 AN input
+    
+        BTW uncomment this portion if you have MEBBE
+        BTW else, this portion should be ignored
+
+            MEBBE BOTH SAEM num AN 2
+                VISIBLE "Enter bill cost: "
+                GIMMEH input
+                VISIBLE "Tip: " + PRODUKT OF input AN 0.1
+            MEBBE BOTH SAEM num AN 3
+                VISIBLE "Enter width: "
+                GIMMEH input
+                VISIBLE "Square Area: " + PRODUKT OF input AN input
+            MEBBE BOTH SAEM num AN 0
+                VISIBLE "Goodbye"
+    
+            NO WAI
+                VISIBLE "IFTHEN: Invalid Input!"
+        OIC
 
     GIMMEH some
     VISIBLE some
@@ -75,7 +121,19 @@ HAI
 
     BTW num R SUM OF 1 AN 2
 
+    OBTW
+    IM IN YR asc UPPIN YR num TIL BOTH SAEM fnum AN SMALLR OF fnum AN num
+        VISIBLE "hi" + num 
+
+    	IM IN YR desc NERFIN YR num2 TIL BOTH SAEM num2 AN 0
+    		VISIBLE "test" + num2
+    	IM OUTTA YR desc
+
+	IM OUTTA YR asc
+    TLDR
+TLDR
 KTHXBYE
+
 
 
 

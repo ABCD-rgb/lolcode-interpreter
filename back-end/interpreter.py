@@ -2,12 +2,46 @@ from syntax_analyzer import Parser, ParseNode, print_tree
 from lexer import lexer
 
 
+class Loop:
+    def __init__(self, loop_type: str, loop_body: ParseNode, label: str, loop_variable: ParseNode, condition: ParseNode = None, operation: bool = None) -> None:
+        self.operation = operation # True if increment, False if decrement
+        self.condition = condition # ParseNode
+        self.loop_variable = loop_variable # ParseNode
+        self.loop_type = loop_type # "wile", "til", "none"
+        self.loop_body = loop_body # ParseNode
+        self.label = label # Label for the loop
+
+
+class Function:
+    def __init__(self, function_name: str, function_parameters: list, function_body: ParseNode) -> None:
+        self.function_symbol_table = SymbolTable()
+        self.function_name = function_name # String
+        self.function_parameters =function_parameters # List of strings
+        self.function_body = function_body # ParseNode
+        
+        # Add IT to the function symbol table
+        self.function_symbol_table.add_variable("IT", None)
+        
+    # Clear the function symbol table
+    def clear_function_symbol_table(self):
+        self.function_symbol_table = SymbolTable()
+        self.function_symbol_table.add_variable("IT", None)
+        
+    def __str__(self) -> str:
+        return self.function_name + "(" + str(self.function_parameters)+ ")"
+    
+    def __repr__(self) -> str:
+        return self.__str__()
+    
+    
+        
+
 class SymbolTable:
     def __init__(self):
         self.variables = {}
         self.functions = {}
         self.call_stack = []
-        self.loop_stack = []
+        self.loop_stack = []    
         self.return_stack = []
         self.current_function = None
         
@@ -34,9 +68,15 @@ class SymbolTable:
                     raise Exception("Error: Variable '" + name + "' is not defined in this scope")
     
     def add_function(self, name, value):
+        # Check if function name is in the list already, raise error if it is
+        if name in self.functions:
+            raise Exception("Error: Function '" + name + "' is already defined in this scope")
         self.functions[name] = value
         
     def get_function(self, name):
+        # Check if function name exists in the list of functions, raise error if it doesn't
+        if name not in self.functions:
+            raise Exception("Error: Function '" + name + "' is not defined in this scope")
         return self.functions[name]
     
     def push_call_stack(self, value):
@@ -115,6 +155,7 @@ class Interpreter:
     def __init__(self, tree: ParseNode, symbols: SymbolTable):
         self.tree = tree
         self.symbolTable = symbols
+        self.main_symbol_table = symbols
         
     def interpret(self):
         self.interpret_root(self.tree)
@@ -138,6 +179,7 @@ class Interpreter:
                 self.interpret_StatementNode(node)
             pass
         elif node.data == "<function>":
+            self.interpret_FunctionNode(node)
             pass
         else:
             raise Exception("Unknown node: " + node.data)
@@ -207,27 +249,146 @@ class Interpreter:
         elif statement_node.data == "<output>":
             self.interpret_OutputNode(statement_node)
         elif statement_node.data == "<expression>":
-            self.interpret_ExpressionNode(statement_node)
+            return self.interpret_ExpressionNode(statement_node)
         elif statement_node.data == "<assignment>":
             self.interpret_AssignmentNode(statement_node)
         elif statement_node.data == "<switch>":
             self.interpret_SwitchCaseNode(statement_node)
         elif statement_node.data == "<loop>":
-            # TODO: self.interpret_LoopNode(statement_node)
-            pass
+            self.interpret_LoopNode(statement_node)
         elif statement_node.data == "<if-then>":
             self.interpret_IfThenNode(statement_node)
-            # TODO: self.interpret_IfThenNode(statement_node)
-            pass
         elif statement_node.data == "<function>":
-            # TODO: self.interpret_FunctionNode(statement_node)
-            pass
-        elif statement_node.data == "<function call>":
-            # TODO: self.interpret_FunctionCallNode(statement_node)
-            pass
+            self.interpret_FunctionNode(statement_node)
+        elif statement_node.data == "<function_call>":
+            return self.interpret_FunctionCallNode(statement_node)
         else:
             # TODO: raise error
             pass
+        
+    def interpret_FunctionNode(self, node: ParseNode):
+        function_name = node.children[1].data
+        
+        parameters = []
+        
+        for child in node.children:
+            if child.data == "<parameter>":
+                parameters.append(child.children[0].data)
+            if child.data == "<more_parameters>":
+                for params in child.children:
+                    if params.data == "<parameter>":
+                        parameters.append(params.children[0].data)
+                        
+        function_body = node.children[-2]
+        
+        # print(f"FUNCTION NAME: {function_name}, PARAMETERS: {parameters}, FUNCTION BODY: {function_body}")
+        function = Function(function_name, parameters, function_body)
+        self.symbolTable.add_function(function_name, function)
+        
+       
+        
+    def interpret_LoopNode(self, node: ParseNode):
+        loop_label = node.children[1].data
+        if loop_label != node.children[-1].data:
+            raise Exception(f"Error: Loop label {loop_label} and {node.children[-1].data} does not match")
+        
+        loop_operation = node.children[2].data
+        
+        try:
+            float(self.interpret_ValueNode(node.children[4]))
+            loop_variable = node.children[4]
+        except:
+            raise Exception("Error: Loop condition must be castable to a NUMBAR")
+        
+        
+        loop_type = None if node.children[5].data not in ["WILE", "TIL"] else node.children[5].data
+        
+        loop_condition = node.children[6] if loop_type != None else None
+        loop_body = node.children[7] if loop_type != None else node.children[5]
+        
+        
+        print(f"LOOP LABEL: {loop_label}, LOOP OPERATION: {loop_operation}, LOOP VARIABLE: {loop_variable}, LOOP TYPE: {loop_type}, LOOP BODY: {loop_body}, LOOP CONDITION: {loop_condition}")       
+    
+        loop = Loop(loop_type, loop_body, loop_label, loop_variable, loop_condition, operation = loop_operation == "UPPIN")
+        
+        self.symbolTable.push_loop_stack(loop)
+        
+        if loop_type == "WILE":
+            self.interpret_WileLoopNode(loop)
+        elif loop_type == "TIL":
+            self.interpret_TilLoopNode(loop)
+        else:
+            self.interpret_NoneLoopNode(loop)
+            
+        self.symbolTable.pop_loop_stack()    
+        
+    def interpret_WileLoopNode(self, loop: Loop):
+        loop_variable = loop.loop_variable
+        loop_variable_name = loop_variable.children[0].children[0].data
+        loop_condition = loop.condition
+        loop_body = loop.loop_body
+        loop_operation = loop.operation
+        # Unused per LOLcode spec
+        loop_label = loop.label
+        
+        # convert loop variable to float
+        self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
+                
+        while self.interpret_ExpressionNode(loop_condition):
+            print(">>>> ON WILE LOOP")
+            gtfo_flag = self.interpret_StatementsNode(loop_body)
+            if gtfo_flag == []:
+                gtfo_flag = False
+                break
+            if loop_operation:
+                self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) + 1)
+            else:
+                self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) - 1)
+                
+    def interpret_TilLoopNode(self, loop: Loop):
+        loop_variable = loop.loop_variable
+        loop_variable_name = loop_variable.children[0].children[0].data
+        loop_condition = loop.condition
+        loop_body = loop.loop_body
+        loop_operation = loop.operation
+        # Unused per LOLcode spec
+        loop_label = loop.label
+        
+        # convert loop variable to float
+        self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
+                
+        while not self.interpret_ExpressionNode(loop_condition):
+            print(">>> ON TIL LOOP")
+            gtfo_flag = self.interpret_StatementsNode(loop_body)
+            if gtfo_flag == []:
+                gtfo_flag = False
+                break
+            if loop_operation:
+                self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) + 1)
+            else:
+                self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) - 1)
+    
+    def interpret_NoneLoopNode(self, loop: Loop):
+        loop_variable = loop.loop_variable
+        loop_variable_name = loop_variable.children[0].children[0].data
+        loop_condition = loop.condition
+        loop_body = loop.loop_body
+        loop_operation = loop.operation
+        # Unused per LOLcode spec
+        loop_label = loop.label
+        
+        # convert loop variable to float
+        self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
+                
+        while True:
+            gtfo_flag = self.interpret_StatementsNode(loop_body)
+            if gtfo_flag == []:
+                gtfo_flag = False
+                break
+            if loop_operation:
+                self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) + 1)
+            else:
+                self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) - 1)
 
 
     def interpret_SwitchCaseNode(self, node: ParseNode):
@@ -246,7 +407,8 @@ class Interpreter:
         if it_value in cases_list:
             gtfo_flag = self.interpret_StatementsNode(cases_list[it_value])        
         
-        if gtfo_flag:
+        if gtfo_flag == []:
+            gtfo_flag = False
             return
         self.interpret_StatementsNode(default_case)
                        
@@ -286,8 +448,11 @@ class Interpreter:
     def interpret_StatementsNode(self, node: ParseNode):
         for child in node.children:
             if child.children[0].data == "GTFO":
-                return True
+                return []
+            if child.children[0].data == "FOUND YR":
+                return self.interpret_ExpressionNode(child.children[1])
             self.interpret_StatementNode(child)
+            
     
     def interpret_AssignmentNode(self, node: ParseNode):
         symbol_name = node.children[0].data
@@ -366,11 +531,80 @@ class Interpreter:
             value = self.interpret_RecastingNode(expression_node)
             return value
         elif expression_node.data == "<function_call>":
-            # TODO: self.interpret_FunctionCallNode(expression_node)
-            pass
+            self.interpret_FunctionCallNode(expression_node)
+            return self.symbolTable.get_variable("IT")
         else:
             # TODO: raise error
             pass
+    def interpret_FunctionCallNode(self, node: ParseNode):
+        function_name = node.children[1].data
+        # Get the function from the symbol table
+        function = self.symbolTable.get_function(function_name)
+        function.function_symbol_table.functions.update(self.symbolTable.functions)
+        
+        parameters = []
+        
+        for child in node.children:
+            if child.data == "<argument>":
+                parameters.append(self.interpret_ValueNode(child.children[0]))
+            if child.data == "<more_arguments>":
+                for params in child.children:
+                    if params.data == "<argument>":
+                        parameters.append(self.interpret_ValueNode(params.children[0]))
+        
+        if node.children[-1].data != "MKAY":
+            raise Exception("Error: Function call does not end with MKAY")
+                        
+        # Check if the number of parameters is equal to the number of function parameters
+        if len(parameters) != len(function.function_parameters):
+            raise Exception("Error: Number of parameters does not match the number of function parameters")
+        
+        # Add the parameters to the function symbol table
+        for i in range(len(parameters)):
+            function.function_symbol_table.add_variable(function.function_parameters[i], parameters[i])
+        
+        print(f"FUNCTION NAME: {function_name}, PARAMETERS: {parameters}, FUNCTION BODY: {function.function_body}")
+        
+        # Set the current symbol table to the function symbol table
+        self.symbolTable = function.function_symbol_table
+        
+        # Push the function to the call stack
+        self.main_symbol_table.push_call_stack(function)
+        
+        # Set the function to the current function
+        self.main_symbol_table.set_current_function(function)
+        
+        # Execute the function body
+        retval = self.interpret_StatementsNode(function.function_body)
+        if retval == []:
+            retval = None
+            
+        # Pop the function from the call stack
+        self.main_symbol_table.pop_call_stack()
+        
+        # clear the function symbol table
+        function.clear_function_symbol_table()
+        
+        # Set the current symbol table to the previous or main symbol table
+        if self.main_symbol_table.call_stack == []:
+            self.symbolTable = self.main_symbol_table
+            current_function = None
+            self.symbolTable.set_current_function(current_function)
+
+        else:
+            self.symbolTable = self.main_symbol_table.call_stack[-1].function_symbol_table
+            current_function = self.main_symbol_table.call_stack[-1]
+            self.main_symbol_table.set_current_function(current_function)
+        
+        # Return the value of the function to its caller
+        self.symbolTable.add_variable("IT", retval)
+        
+        return retval
+            
+        
+        
+        
+        
     
     # ==== ARITHMETIC operations ====
     # type checking (must be NUMBR or NUMBAR)
