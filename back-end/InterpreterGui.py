@@ -128,15 +128,38 @@ class InterpreterGUI:
         sys.stderr = sys.__stderr__
         self.root.destroy()
 
+    def build_tree(self, node, text_widget, indent=0, prefix=''):
+        if node is not None:
+            text_widget.insert(tk.END, ' ' * indent + prefix + node.data + '\n')
+            for child in node.children:
+                self.build_tree(child, text_widget, indent + 4, "|-- ")
+
     def view_parse_tree(self):
         # create a new top-level window
         parse_tree_window = tk.Toplevel(self.root)
         parse_tree_window.title("Parse Tree")
 
+        # Text Editor
+        parse_tree_widget = scrolledtext.ScrolledText(parse_tree_window, width=100, height=45)
+        parse_tree_widget.grid(row=0, column=0, pady=2, padx=2)
+
+        self.build_tree(self.parser.parse_tree, parse_tree_widget)
+
     def execute_code(self):
-        if self.file_path:
+        # write whatever is in the text editor to the file given the path
+        if self.file_path != "":
             with open(self.file_path, 'w') as file:
                 file.write(self.text_editor.get("1.0", tk.END))
+        else: # create a new file
+            self.file_path = filedialog.asksaveasfilename(defaultextension=".lol", filetypes=[("LOLCODE files", "*.lol"), ("All files", "*.*")])
+
+            if self.file_path != "":
+                # write to file
+                with open(self.file_path, 'w') as file:
+                    file.write(self.text_editor.get("1.0", tk.END))
+
+            else:
+                print("Error creating a file. Please put a file name")
 
         # get the lexemes
         self.lexemes = lexer(self.file_path)
