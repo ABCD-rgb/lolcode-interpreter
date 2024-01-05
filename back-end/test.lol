@@ -16,7 +16,7 @@ HAI
 
     VISIBLE "Hi " + "Hello " + "Bye " 
     VISIBLE "Hello " + "Hello " + "Bye " 
-    BTW MAEK some A NUMBAR
+    MAEK some A NUMBAR
     BTW num R MAEK num YARN
     BTW fnum IS NOW A NUMBR
 
@@ -76,6 +76,8 @@ HAI
     BTW num R SUM OF 1 AN 2
 
 KTHXBYE
+
+
 
 
 
