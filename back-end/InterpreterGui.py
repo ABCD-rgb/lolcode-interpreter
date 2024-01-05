@@ -1,9 +1,53 @@
 import tkinter as tk
-from tkinter import filedialog, scrolledtext, ttk
+from tkinter import filedialog, scrolledtext, ttk, simpledialog
 from lexer import lexer
 from interpreter import SymbolTable, Interpreter
 from syntax_analyzer import Parser
+import sys
 
+class TextRedirector:
+    def __init__ (self, text_widget):
+        self.text_widget = text_widget
+
+    def write(self, text):
+        # Make the text widget editable
+        self.text_widget.config(state="normal")
+
+        # Insert the text
+        self.text_widget.insert(tk.END, text)
+        self.text_widget.see(tk.END)
+
+        # Make the text widget read-only again
+        self.text_widget.config(state="disabled")
+    
+    def flush(self):
+        pass
+
+class InputRedirector:
+    def __init__(self, input_function):
+        self.input_function = input_function
+
+    def readline(self):
+        user_input = self.input_function()
+        return user_input + '\n'
+    
+class StderrRedirector:
+    def __init__(self, text_widget):
+        self.text_widget = text_widget
+
+    def write(self, message):
+        # Make the text widget editable
+        self.text_widget.config(state="normal")
+
+        # Insert the text
+        self.text_widget.insert(tk.END, message)
+        self.text_widget.see(tk.END)
+
+        # Make the text widget read-only again
+        self.text_widget.config(state="disabled")
+
+    def flush(self):
+        pass
 
 class InterpreterGUI:
     def __init__(self, root):
@@ -48,7 +92,17 @@ class InterpreterGUI:
 
         # Console
         self.console = scrolledtext.ScrolledText(root, width=80, height=20)
+        self.console.config(state="disabled")
         self.console.grid(row=3, column=0, columnspan=3, pady=2, padx=5, sticky="ew")
+
+        # Redirect the print statements to the text widget
+        sys.stdout = TextRedirector(self.console)
+
+        # Redirect the input to the input dialog
+        sys.stdin = InputRedirector(self.get_input_from_dialog)
+
+        # Redirect stderr to the text widget
+        sys.stderr = StderrRedirector(self.console)
 
         # Configure row and column weights for resizing
         root.grid_rowconfigure(1, weight=1)
@@ -58,11 +112,24 @@ class InterpreterGUI:
         root.grid_columnconfigure(1, weight=1)
         root.grid_columnconfigure(2, weight=1)
 
+        # To restore stdin on application exit
+        root.protocol("WM_DELETE_WINDOW", self.restore_stdin)
+
+    # get input from dialog box
+    def get_input_from_dialog(self):
+        user_input = simpledialog.askstring("Input", "Enter Input: ")
+        return user_input
+    
+    # Restore the stdin
+    def restore_stdin(self):
+        # restore stdin before closing the application
+        sys.stdin = sys.__stdin__
+        self.root.destroy()
+
     def view_parse_tree(self):
         # create a new top-level window
         parse_tree_window = tk.Toplevel(self.root)
         parse_tree_window.title("Parse Tree")
-
 
     def execute_code(self):
         if self.file_path:
@@ -107,10 +174,6 @@ class InterpreterGUI:
                 self.text_editor.insert(tk.END, file_content)
 
         self.file_path = file_path
-
-    def write_to_console(self, message):
-        self.console.insert(tk.END, message)
-        self.console.see(tk.END)
 
     def create_scrollable_table(self, parent, headers):
         table_frame = tk.Frame(parent)
