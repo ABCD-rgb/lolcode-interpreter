@@ -168,9 +168,11 @@ class Interpreter:
     
     def interpret_ProgramNode(self, node: ParseNode):
         if node.data == "HAI":
-            print("HAI")
+            # print("HAI")
+            pass
         elif node.data == "KTHXBYE":
-            print("KTHXBYE")
+            # print("KTHXBYE")
+            pass
         elif node.data == "<wazzup>":
             for node in node.children:
                 self.interpret_WazzupNode(node)
@@ -307,7 +309,7 @@ class Interpreter:
         loop_body = node.children[7] if loop_type != None else node.children[5]
         
         
-        print(f"LOOP LABEL: {loop_label}, LOOP OPERATION: {loop_operation}, LOOP VARIABLE: {loop_variable}, LOOP TYPE: {loop_type}, LOOP BODY: {loop_body}, LOOP CONDITION: {loop_condition}")       
+        # print(f"LOOP LABEL: {loop_label}, LOOP OPERATION: {loop_operation}, LOOP VARIABLE: {loop_variable}, LOOP TYPE: {loop_type}, LOOP BODY: {loop_body}, LOOP CONDITION: {loop_condition}")       
     
         loop = Loop(loop_type, loop_body, loop_label, loop_variable, loop_condition, operation = loop_operation == "UPPIN")
         
@@ -335,7 +337,7 @@ class Interpreter:
         self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
                 
         while self.interpret_ExpressionNode(loop_condition):
-            print(">>>> ON WILE LOOP")
+            # print(">>>> ON WILE LOOP")
             gtfo_flag = self.interpret_StatementsNode(loop_body)
             if gtfo_flag == []:
                 gtfo_flag = False
@@ -358,7 +360,7 @@ class Interpreter:
         self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
                 
         while not self.interpret_ExpressionNode(loop_condition):
-            print(">>> ON TIL LOOP")
+            # print(">>> ON TIL LOOP")
             gtfo_flag = self.interpret_StatementsNode(loop_body)
             if gtfo_flag == []:
                 gtfo_flag = False
@@ -393,7 +395,7 @@ class Interpreter:
 
     def interpret_SwitchCaseNode(self, node: ParseNode):
         it_value = self.symbolTable.get_variable("IT")
-        print(f"HI: {node.children[0].data}")
+        # print(f"HI: {node.children[0].data}")
         cases = node.children[1].children
         default_case = None
         cases_list = {}
@@ -563,7 +565,7 @@ class Interpreter:
         for i in range(len(parameters)):
             function.function_symbol_table.add_variable(function.function_parameters[i], parameters[i])
         
-        print(f"FUNCTION NAME: {function_name}, PARAMETERS: {parameters}, FUNCTION BODY: {function.function_body}")
+        # print(f"FUNCTION NAME: {function_name}, PARAMETERS: {parameters}, FUNCTION BODY: {function.function_body}")
         
         # Set the current symbol table to the function symbol table
         self.symbolTable = function.function_symbol_table
@@ -647,30 +649,30 @@ class Interpreter:
         right_value = self.arithmetic_value_check(right_value)
 
         # type should be <literal> or <identifier> at this point
-        print(operator)
+        # print(operator)
         if operator == "SUM OF":
-            print(left_value + right_value)
+            # print(left_value + right_value)
             return left_value + right_value
         elif operator == "DIFF OF":
-            print(left_value - right_value)
+            # print(left_value - right_value)
             return left_value - right_value
         elif operator == "PRODUKT OF":
-            print(left_value * right_value)
+            # print(left_value * right_value)
             return left_value * right_value
         elif operator == "QUOSHUNT OF":
             # Division by zero error    
             if right_value == 0:
                 raise Exception("Division by Zero Error: Cannot divide by zero")
-            print(left_value / right_value)
+            # print(left_value / right_value)
             return left_value / right_value
         elif operator == "MOD OF":
-            print(left_value % right_value)
+            # print(left_value % right_value)
             return left_value % right_value
         elif operator == "BIGGR OF":
-            print(max(left_value, right_value))
+            # print(max(left_value, right_value))
             return max(left_value, right_value)
         elif operator == "SMALLR OF":
-            print(min(left_value, right_value))
+            # print(min(left_value, right_value))
             return min(left_value, right_value)
     # ==== END ARITHMETIC operations ====
     
@@ -693,7 +695,7 @@ class Interpreter:
 
         value = ''.join(strings)
 
-        print(value)
+        # print(value)
         return value    
     # ==== END CONCATENATION operations ====
 
@@ -710,35 +712,35 @@ class Interpreter:
     def interpret_BooleanNode(self, node: ParseNode):
         # children value can be of any data type but will be typecast to TROOF
         # array of strings to be concatenated
-        print(node.data)
+        # print(node.data)
         operator = node.children[0].data
 
-        print(operator)
+        # print(operator)
         # finite; two operands
         if operator != "ALL OF" and operator != "ANY OF" and operator != "NOT":
             left_value = self.interpret_ValueNode(node.children[1])     # <value>
             right_value = self.interpret_ValueNode(node.children[3])    # <value>
-            print(left_value, right_value) 
+            # print(left_value, right_value) 
 
             # check type and implicitly cast if necessary (must be TROOF)
             left_value = self.boolean_value_check(left_value)
             right_value = self.boolean_value_check(right_value)
 
             if operator == "BOTH OF":       # AND
-                print(operator, left_value and right_value)
+                # print(operator, left_value and right_value)
                 return (left_value and right_value)
             elif operator == "EITHER OF":   # OR
-                print(operator, (left_value or right_value))
+                # print(operator, (left_value or right_value))
                 return (left_value or right_value)
             elif operator == "WON OF":      # XOR
-                print(operator, (left_value ^ right_value))
+                # print(operator, (left_value ^ right_value))
                 return (left_value ^ right_value)
         # finite; one operand
         elif operator == "NOT":
             only_value = self.interpret_ValueNode(node.children[1])
             # check type and implicitly cast if necessary (must be TROOF)
             only_value = self.boolean_value_check(only_value)
-            print(operator, (not only_value))
+            # print(operator, (not only_value))
             return (not only_value)
         # infinite
         else:
@@ -751,10 +753,10 @@ class Interpreter:
                     values.append(value)
             
             if operator == "ALL OF":    # infinite arity AND
-                print(operator, all(values))
+                # print(operator, all(values))
                 return all(values)
             elif operator == "ANY OF":  # infinite arity OR
-                print(operator, any(values))
+                # print(operator, any(values))
                 return any(values)
     # ==== END BOOLEAN operations ====
             
@@ -765,7 +767,7 @@ class Interpreter:
 
         # comparison operations
         if len(node.children) == 4:
-            print(">>> comparison operations")
+            # print(">>> comparison operations")
             operator = node.children[0].data
             left_value = self.interpret_ValueNode(node.children[1])
             right_value = self.interpret_ValueNode(node.children[3])
@@ -777,14 +779,14 @@ class Interpreter:
                 raise Exception(f"Type Error: '{right_value}' is not a NUMBR or NUMBAR")
 
             if operator == "BOTH SAEM":
-                print(operator, (left_value == right_value))
+                # print(operator, (left_value == right_value))
                 return (left_value == right_value)
             elif operator == "DIFFRINT":
-                print(operator, (left_value != right_value))
+                # print(operator, (left_value != right_value))
                 return (left_value != right_value)
         # relational operations
         else :
-            print(">>> relational operations")
+            # print(">>> relational operations")
             operator = node.children[0].data
             operator2 = node.children[3].data
             left_value = self.interpret_ValueNode(node.children[1])
@@ -802,17 +804,17 @@ class Interpreter:
             
             if operator == "BOTH SAEM":
                 if operator2 == "BIGGR OF":
-                    print(operator, (left_value >= right_value))
+                    # print(operator, (left_value >= right_value))
                     return (left_value >= right_value)
                 elif operator2 == "SMALLR OF":
-                    print(operator, (left_value <= right_value))
+                    # print(operator, (left_value <= right_value))
                     return (left_value <= right_value)
             elif operator == "DIFFRINT":
                 if operator2 == "BIGGR OF":
-                    print(operator, (left_value < right_value))
+                    # print(operator, (left_value < right_value))
                     return (left_value < right_value)
                 elif operator2 == "SMALLR OF":
-                    print(operator, (left_value > right_value))
+                    # print(operator, (left_value > right_value))
                     return (left_value > right_value)
     # ==== END COMPARISON operations ====
                 
@@ -836,7 +838,7 @@ class Interpreter:
         # YARN 
             # YARN can be successfully cast into a NUMBAR or NUMBR if YARN does not contain non-numerical, non-hyphen, nom-period characters
         
-        print(node.data)
+        # print(node.data)
         
         # using MAEK operator only modifies the resulting value and not the variable involved
         if node.children[0].data == "MAEK":
@@ -851,17 +853,17 @@ class Interpreter:
                 raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NOOB")
             elif typecast_type == "TROOF":
                 if not only_value:
-                    print("FAIL")
+                    # print("FAIL")
                     return False
                 else:
-                    print("WIN")
+                    # print("WIN")
                     return True
             elif typecast_type == "NUMBAR":
                 try:
                     if only_value == None:
                         return 0.0
                     else:
-                        print(float(only_value))
+                        # print(float(only_value))
                         return float(only_value)
                 except:
                     raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBAR")
@@ -870,7 +872,7 @@ class Interpreter:
                     if only_value == None:
                         return 0
                     else:
-                        print(int(only_value))
+                        # print(int(only_value))
                         return int(only_value)
                 except:
                     raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBR")
@@ -878,17 +880,17 @@ class Interpreter:
                 if only_value == None:
                     return ""
                 elif type(only_value) == str:
-                    print(str(only_value))
+                    # print(str(only_value))
                     return str(only_value)
                 elif type(only_value) == int or type(only_value) == float:
-                    print(str(round(only_value, 2)))
+                    # print(str(round(only_value, 2)))
                     return str(round(only_value, 2))
                 elif type(only_value) == bool:
                     if only_value:
-                        print("WIN")
+                        # print("WIN")
                         return "WIN"
                     else:
-                        print("FAIL")
+                        # print("FAIL")
                         return "FAIL"
 
                 
@@ -914,15 +916,15 @@ class Interpreter:
         # YARN 
             # YARN can be successfully cast into a NUMBAR or NUMBR if YARN does not contain non-numerical, non-hyphen, nom-period characters
         
-        print(node.data)
+        # print(node.data)
         
         # using MAEK operator only modifies the resulting value and not the variable involved
-        print(node.children[1].data)
+        # print(node.children[1].data)
         if node.children[1].data == "IS NOW A":
             variable_name = node.children[0].children[0].children[0].data
             
             only_value = self.interpret_ValueNode(node.children[0])
-            print(f"ONLY VALUE: {only_value}")
+            # print(f"ONLY VALUE: {only_value}")
             # syntax may be: number IS NOW A NUMBAR BTW number is NUMBAR type now (17.0)
             typecast_type = node.children[2].data
             
@@ -930,12 +932,12 @@ class Interpreter:
                 raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NOOB")
             elif typecast_type == "TROOF":
                 if not only_value:
-                    print("FAIL")
+                    # print("FAIL")
                     self.symbolTable.add_variable(variable_name, False)
                     return self.symbolTable.get_variable(variable_name)
                 else:
                     self.symbolTable.add_variable(variable_name, True)
-                    print("WIN")
+                    # print("WIN")
                     return self.symbolTable.get_variable(variable_name)
             elif typecast_type == "NUMBAR":
                 try:
@@ -953,7 +955,7 @@ class Interpreter:
                         self.symbolTable.add_variable(variable_name, 0)
                         return self.symbolTable.get_variable(variable_name)
                     else:
-                        print(f"NUMBR: {only_value}")
+                        # print(f"NUMBR: {only_value}")
                         self.symbolTable.add_variable(variable_name, int(only_value))
                         return self.symbolTable.get_variable(variable_name)
                 except:

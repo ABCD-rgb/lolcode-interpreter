@@ -21,7 +21,7 @@ HAI
         I HAS A flag ITZ WIN
 	I HAS A mamon ITZ "sixteen"
 	I HAS A cup ITZ "you hehe"
-    BUHBYE
+    BUHBYE 
 
 
 
@@ -31,7 +31,7 @@ HAI
     BTW I IZ printName YR "qwertyu" MKAY
 
 
-OBTW
+
     BOTH SAEM num AN 1
     O RLY?
 		YA RLY
@@ -131,8 +131,13 @@ OBTW
 
 	IM OUTTA YR asc
     TLDR
-TLDR
+
 KTHXBYE
+
+
+
+
+
 
 
 

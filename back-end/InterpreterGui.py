@@ -161,6 +161,8 @@ class InterpreterGUI:
             else:
                 print("Error creating a file. Please put a file name")
 
+        self.console.delete('1.0', tk.END)
+
         # get the lexemes
         self.lexemes = lexer(self.file_path)
         # clear symbol table
