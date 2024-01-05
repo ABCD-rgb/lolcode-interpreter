@@ -2,7 +2,7 @@ import patterns as p
 import lexer as l
 
 
-lexemes = l.lexer("test.lol")
+lexemes = l.lexer("project-testcases/10_functions.lol")
 # print(lexemes)
 
 class ParseNode:
@@ -183,7 +183,7 @@ class Parser:
                         node.children.append(statement_node)
                         statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
                         self.advance()
-                        self.expression(statement_node)
+                        self.value(statement_node)
                 elif self.backtracking(node, 1) == "<loop>":
                     if self.current_tok.keyword == "IM OUTTA YR":
                         return
@@ -468,6 +468,8 @@ class Parser:
                     self.parameter(function_node)
                     while self.current_tok.keyword == "AN":
                         self.more_parameters(function_node)
+                else:
+                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
                 self.statements(function_node)
                 if self.current_tok.keyword == "IF U SAY SO":
                     function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))

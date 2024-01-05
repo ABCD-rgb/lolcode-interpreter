@@ -167,6 +167,7 @@ class InterpreterGUI:
         self.lexemes = lexer(self.file_path)
         # clear symbol table
         self.symbols = SymbolTable()
+        self.symbols.add_variable("IT", None)
         self.parser = Parser(self.lexemes)
         self.tree = self.parser.parse()
         self.interpreter = Interpreter(self.tree, self.symbols)

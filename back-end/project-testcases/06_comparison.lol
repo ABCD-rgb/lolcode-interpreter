@@ -9,6 +9,11 @@ HAI
     VISIBLE "Value 2: "
     GIMMEH y
 
+    BTW convert x and y to numerical value
+    BTW no automatic typecasting for operands in comparison operations
+    x IS NOW A NUMBAR
+    y IS NOW A NUMBAR
+
     BTW x==y
     VISIBLE BOTH SAEM x AN y
     BTW x!=y

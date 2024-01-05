@@ -62,7 +62,8 @@ class SymbolTable:
             else:
                 # If name is not in the list of valid names and is not a function, check if it is a keyword
                 if name == "IT":
-                    return self.variables[name]
+                    value = self.variables[name]
+                    return value
                 else:
                     # If name is not in the list of valid names, is not a function, and is not a keyword, raise an error
                     raise Exception("Error: Variable '" + name + "' is not defined in this scope")
@@ -264,9 +265,7 @@ class Interpreter:
             self.interpret_FunctionNode(statement_node)
         elif statement_node.data == "<function_call>":
             return self.interpret_FunctionCallNode(statement_node)
-        else:
-            # TODO: raise error
-            pass
+
         
     def interpret_FunctionNode(self, node: ParseNode):
         function_name = node.children[1].data
@@ -395,6 +394,7 @@ class Interpreter:
 
     def interpret_SwitchCaseNode(self, node: ParseNode):
         it_value = self.symbolTable.get_variable("IT")
+        gtfo_flag = None
         # print(f"HI: {node.children[0].data}")
         cases = node.children[1].children
         default_case = None
@@ -428,7 +428,6 @@ class Interpreter:
         self.symbolTable.add_variable("IT", expression_value)
         if_clause = node.children[2]
         elif_clauses = [node.children[i] for i in range(3, len(node.children) - 2)]
-        else_clause = node.children[-2]
         noMatch = True
         # if expression is true, execute statements
         if expression_value:
@@ -443,8 +442,10 @@ class Interpreter:
                     break
             # if no elif clause is true, execute else clause
             if noMatch:
-                self.interpret_StatementsNode(else_clause.children[1])
-        
+                for child in node.children:
+                    if child.data == "<else>":
+                        self.interpret_StatementsNode(child.children[1])
+                        break        
                 
     
     def interpret_StatementsNode(self, node: ParseNode):
@@ -452,7 +453,7 @@ class Interpreter:
             if child.children[0].data == "GTFO":
                 return []
             if child.children[0].data == "FOUND YR":
-                return self.interpret_ExpressionNode(child.children[1])
+                return self.interpret_ValueNode(child.children[1])
             self.interpret_StatementNode(child)
             
     
@@ -460,10 +461,8 @@ class Interpreter:
         symbol_name = node.children[0].data
         symbol_value = self.interpret_ValueNode(node.children[2])
         # Get the value in the symbol table to check if it exists
-        if self.symbolTable.get_variable(symbol_name) != None:
-            self.symbolTable.add_variable(symbol_name, symbol_value)
-        else:
-            raise Exception("Error: Variable '" + symbol_name + "' is not defined in this scope")
+        self.symbolTable.get_variable(symbol_name)
+        self.symbolTable.add_variable(symbol_name, symbol_value)
             
 
     def interpret_InputNode(self, node: ParseNode):
@@ -535,9 +534,8 @@ class Interpreter:
         elif expression_node.data == "<function_call>":
             self.interpret_FunctionCallNode(expression_node)
             return self.symbolTable.get_variable("IT")
-        else:
-            # TODO: raise error
-            pass
+
+
     def interpret_FunctionCallNode(self, node: ParseNode):
         function_name = node.children[1].data
         # Get the function from the symbol table
@@ -615,10 +613,14 @@ class Interpreter:
         # if cannot be caster to NUMBR OR NUMBAR, raise error
         if (type(value) == str):
             try:
-                # TODO: determine if should be typecasted to int or float (currently FLOAT always)
-                value = float(value)
+                try:
+                    value = int(value)
+                except:
+                    value = float(value)
             except:
                 raise Exception(f"Typecast Error: '{value}' cannot be casted to NUMBR or NUMBAR")
+        elif value == None:
+            value = 0
         return value
     
 
@@ -985,7 +987,7 @@ class Interpreter:
 def main():        
     symbols = SymbolTable()
     symbols.add_variable("IT", None)
-    lexemes = lexer("test.lol")
+    lexemes = lexer("project-testcases/10_functions.lol")
     parser = Parser(lexemes)
     tree = parser.parse()
     interpreter = Interpreter(tree, symbols)
