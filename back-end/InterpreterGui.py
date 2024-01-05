@@ -112,8 +112,8 @@ class InterpreterGUI:
         root.grid_columnconfigure(1, weight=1)
         root.grid_columnconfigure(2, weight=1)
 
-        # To restore stdin on application exit
-        root.protocol("WM_DELETE_WINDOW", self.restore_stdin)
+        # To restore stdin, stdout, and stderr on application exit
+        root.protocol("WM_DELETE_WINDOW", self.restore)
 
     # get input from dialog box
     def get_input_from_dialog(self):
@@ -121,9 +121,11 @@ class InterpreterGUI:
         return user_input
     
     # Restore the stdin
-    def restore_stdin(self):
-        # restore stdin before closing the application
+    def restore(self):
+        # restore stdin, stdout, and stderr before closing the application
         sys.stdin = sys.__stdin__
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
         self.root.destroy()
 
     def view_parse_tree(self):
