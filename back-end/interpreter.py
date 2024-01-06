@@ -3,7 +3,6 @@ from lexer import lexer
 import tkinter as tk
 from tkinter import filedialog, scrolledtext, ttk, simpledialog
 import sys
-import time
 
 class Loop:
     def __init__(self, loop_type: str, loop_body: ParseNode, label: str, loop_variable: ParseNode, condition: ParseNode = None, operation: bool = None) -> None:
@@ -213,6 +212,8 @@ class Interpreter:
             symbol_value = None
         
         self.symbolTable.add_variable(symbol_name, symbol_value)
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
             
         
 
@@ -337,6 +338,8 @@ class Interpreter:
         
         # convert loop variable to float
         self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
                 
         while self.interpret_ExpressionNode(loop_condition):
             # print(">>>> ON WILE LOOP")
@@ -346,8 +349,12 @@ class Interpreter:
                 break
             if loop_operation:
                 self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) + 1)
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
             else:
                 self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) - 1)
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
                 
     def interpret_TilLoopNode(self, loop: Loop):
         loop_variable = loop.loop_variable
@@ -360,6 +367,8 @@ class Interpreter:
         
         # convert loop variable to float
         self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
                 
         while not self.interpret_ExpressionNode(loop_condition):
             # print(">>> ON TIL LOOP")
@@ -369,8 +378,12 @@ class Interpreter:
                 break
             if loop_operation:
                 self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) + 1)
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
             else:
                 self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) - 1)
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
     
     def interpret_NoneLoopNode(self, loop: Loop):
         loop_variable = loop.loop_variable
@@ -383,6 +396,8 @@ class Interpreter:
         
         # convert loop variable to float
         self.symbolTable.add_variable(loop_variable_name, float(self.interpret_ValueNode(loop_variable)))
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
                 
         while True:
             gtfo_flag = self.interpret_StatementsNode(loop_body)
@@ -391,8 +406,12 @@ class Interpreter:
                 break
             if loop_operation:
                 self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) + 1)
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
             else:
                 self.symbolTable.add_variable(loop_variable_name, self.symbolTable.get_variable(loop_variable_name) - 1)
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
 
 
     def interpret_SwitchCaseNode(self, node: ParseNode):
@@ -429,6 +448,8 @@ class Interpreter:
         #     self.interpret_StatementsNode(else_clause.children[1])
         expression_value = self.interpret_ExpressionNode(node.children[0])
         self.symbolTable.add_variable("IT", expression_value)
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
         if_clause = node.children[2]
         elif_clauses = [node.children[i] for i in range(3, len(node.children) - 2)]
         noMatch = True
@@ -466,6 +487,8 @@ class Interpreter:
         # Get the value in the symbol table to check if it exists
         self.symbolTable.get_variable(symbol_name)
         self.symbolTable.add_variable(symbol_name, symbol_value)
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
             
 
     def interpret_InputNode(self, node: ParseNode):
@@ -513,25 +536,45 @@ class Interpreter:
             checkDeclar = self.backtracking(expression_node, "<declaration>")
             if checkAssignment == None:
                 self.symbolTable.add_variable("IT", value)
+
+            # update symbol table
+            app.populate_symbol_table(self.main_symbol_table.variables)
+
             return value
         elif expression_node.data == "<concatenation>":
             value = self.interpret_ConcatenationNode(expression_node)
             # Store to IT
             self.symbolTable.add_variable("IT", value)
+
+            # update symbol table
+            app.populate_symbol_table(self.main_symbol_table.variables)
+
             return value
         elif expression_node.data == "<boolean>":
             value = self.interpret_BooleanNode(expression_node)
             # Store to IT
             self.symbolTable.add_variable("IT", value)
+
+            # update symbol table
+            app.populate_symbol_table(self.main_symbol_table.variables)
+
             return value
         elif expression_node.data == "<comparison>":
             value = self.interpret_ComparisonNode(expression_node)
             # Store to IT
             self.symbolTable.add_variable("IT", value)
+
+            # update symbol table
+            app.populate_symbol_table(self.main_symbol_table.variables)
+
             return value
         elif expression_node.data == "<typecasting>":
             value = self.interpret_TypecastingNode(expression_node)
             self.symbolTable.add_variable("IT", value)
+
+            # update symbol table
+            app.populate_symbol_table(self.main_symbol_table.variables)
+
             return value
         elif expression_node.data == "<recasting>":
             value = self.interpret_RecastingNode(expression_node)
@@ -603,6 +646,9 @@ class Interpreter:
         
         # Return the value of the function to its caller
         self.symbolTable.add_variable("IT", retval)
+
+        # update symbol table
+        app.populate_symbol_table(self.main_symbol_table.variables)
         
         return retval
             
@@ -941,18 +987,34 @@ class Interpreter:
                 if not only_value:
                     # print("FAIL")
                     self.symbolTable.add_variable(variable_name, False)
+
+                    # update symbol table
+                    app.populate_symbol_table(self.main_symbol_table.variables)
+
                     return self.symbolTable.get_variable(variable_name)
                 else:
                     self.symbolTable.add_variable(variable_name, True)
+
+                    # update symbol table
+                    app.populate_symbol_table(self.main_symbol_table.variables)
+
                     # print("WIN")
                     return self.symbolTable.get_variable(variable_name)
             elif typecast_type == "NUMBAR":
                 try:
                     if only_value == None:
                         self.symbolTable.add_variable(variable_name, 0.0)
+
+                        # update symbol table
+                        app.populate_symbol_table(self.main_symbol_table.variables)
+                        
                         return self.symbolTable.get_variable(variable_name)
                     else:
                         self.symbolTable.add_variable(variable_name, float(only_value))
+
+                        # update symbol table
+                        app.populate_symbol_table(self.main_symbol_table.variables)
+
                         return self.symbolTable.get_variable(variable_name)
                 except:
                     raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NUMBAR")
@@ -960,16 +1022,28 @@ class Interpreter:
                 try:
                     if only_value == None:
                         self.symbolTable.add_variable(variable_name, 0)
+
+                        # update symbol table
+                        app.populate_symbol_table(self.main_symbol_table.variables)
+
                         return self.symbolTable.get_variable(variable_name)
                     else:
                         # print(f"NUMBR: {only_value}")
                         self.symbolTable.add_variable(variable_name, int(only_value))
+
+                        # update symbol table
+                        app.populate_symbol_table(self.main_symbol_table.variables)
+                
                         return self.symbolTable.get_variable(variable_name)
                 except:
                     raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NUMBR")
             elif typecast_type == "YARN":
                 if only_value == None:
                     self.symbolTable.add_variable(variable_name, "")
+
+                    # update symbol table
+                    app.populate_symbol_table(self.main_symbol_table.variables)
+
                     return self.symbolTable.get_variable(variable_name)
                 
                 # If decimal (NUMBAR) round to 2 decimal places
@@ -983,6 +1057,10 @@ class Interpreter:
                         only_value = "FAIL"
                         
                 self.symbolTable.add_variable(variable_name, str(only_value))
+
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
+
                 return self.symbolTable.get_variable(variable_name)
     
     # ==== END TYPECASTING operations ====
@@ -1038,7 +1116,7 @@ class InterpreterGUI:
         self.file_path = ""
         self.lexemes = []
         self.symbols = SymbolTable()
-        self.symbols.add_variable("IT", None)
+        # self.symbols.add_variable("IT", None)
         self.variables = {}
 
         # File Explorer
@@ -1161,7 +1239,7 @@ class InterpreterGUI:
 
         # clear symbol table
         self.symbols = SymbolTable()
-        self.symbols.add_variable("IT", None)
+        # self.symbols.add_variable("IT", None)
         self.parser = Parser(self.lexemes)
         self.tree = self.parser.parse()
         self.interpreter = Interpreter(self.tree, self.symbols)
