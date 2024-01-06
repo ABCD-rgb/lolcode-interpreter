@@ -428,7 +428,7 @@ class Interpreter:
                 cases_list[case_key] = case_body
             elif case.data == "<default>":  
                 default_case= case.children[1]
-        if it_value in cases_list:
+        if it_value in cases_list.keys():
             gtfo_flag = self.interpret_StatementsNode(cases_list[it_value])        
         
         if gtfo_flag == []:
@@ -568,6 +568,17 @@ class Interpreter:
             app.populate_symbol_table(self.main_symbol_table.variables)
 
             return value
+        # NOTE: newly added to store value to IT
+        elif expression_node.data == "<value>":
+            # value needs to be an identifier
+            if expression_node.children[0].data == "<identifier>":
+                value = self.interpret_ValueNode(expression_node)
+                self.symbolTable.add_variable("IT", value)
+
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
+
+                return value
         elif expression_node.data == "<typecasting>":
             value = self.interpret_TypecastingNode(expression_node)
             self.symbolTable.add_variable("IT", value)

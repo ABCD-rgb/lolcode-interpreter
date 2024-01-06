@@ -2,7 +2,7 @@ import patterns as p
 import lexer as l
 
 
-lexemes = l.lexer("project-testcases/10_functions.lol")
+lexemes = l.lexer("project-testcases/test.lol")
 # print(lexemes)
 
 class ParseNode:
@@ -259,13 +259,20 @@ class Parser:
             if self.current_tok.keyword == "O RLY?":
                 if_then_flag = True
         # Recasting
-        elif self.current_tok.token_type == "Identifier":
+        elif self.current_tok.token_type == "Identifier" and self.lookAhead(1) is not None and self.lookAhead(1).keyword == "IS NOW A":
             self.recasting(expression_node)
             if self.current_tok.keyword == "O RLY?":
                 if_then_flag = True
         # function call
         elif self.current_tok.keyword == "I IZ":
             self.function_call(expression_node)
+            if self.current_tok.keyword == "O RLY?":
+                if_then_flag = True
+        # NOTE: newly added to accept identifier as an expression
+        # identifier
+        elif self.current_tok.token_type == "Identifier":
+            print("here")
+            self.value(expression_node)
             if self.current_tok.keyword == "O RLY?":
                 if_then_flag = True
         else:

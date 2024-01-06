@@ -13,6 +13,7 @@ HAI
     WAZZUP
         BTW variable dec
         I HAS A monde
+        I HAS A choice
         I HAS A some
         I HAS A num ITZ 2
         I HAS A num2 ITZ 3
@@ -136,7 +137,43 @@ HAI
     some R FAIL
     some IS NOW A NUMBR
 
+    VISIBLE "Choice: "
+	GIMMEH choice
+    choice IS NOW A NUMBR
+
+    BTW 'WTF?' uses the implicit value of IT
+	choice
+        
+	WTF?
+		OMG 1
+			VISIBLE "Enter birth year: "
+			GIMMEH input
+			VISIBLE DIFF OF 2022 AN input
+			GTFO
+		OMG 2
+			VISIBLE "Enter bill cost: "
+			GIMMEH input
+			VISIBLE "Tip: " + PRODUKT OF input AN 0.1
+			GTFO
+		OMG 3
+			VISIBLE "Enter width: "
+			GIMMEH input
+			VISIBLE "Square Area: " + PRODUKT OF input AN input
+			GTFO
+		OMG 0
+			VISIBLE "Goodbye"
+		OMGWTF
+			VISIBLE "Invalid Input!"
+	OIC
+
 KTHXBYE
+
+
+
+
+
+
+
 
 
 
