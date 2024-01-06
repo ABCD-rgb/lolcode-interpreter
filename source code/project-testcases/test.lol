@@ -131,8 +131,20 @@ HAI
 
 	IM OUTTA YR asc
     TLDR
+   
+    some IS NOW A TROOF
+    some R FAIL
+    some IS NOW A NUMBR
 
 KTHXBYE
+
+
+
+
+
+
+
+
 
 
 

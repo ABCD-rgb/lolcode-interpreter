@@ -39,6 +39,12 @@ class Parser:
             self.current_tok = self.tokens[self.tok_idx]
         return self.current_tok
     
+    def check_advance(self):
+        if self.tok_idx + 1 < len(self.tokens):
+            return self.tokens[self.tok_idx + 1]
+        else:
+            return None
+    
     def parse(self):
         res = self.program()
         return res
@@ -68,7 +74,7 @@ class Parser:
             self.parse_tree.children.append(ParseNode(self.current_tok.keyword, parent=self.parse_tree))
             return self.parse_tree
         
-        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}")
+        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
     def wazzup(self, node):
         wazzup_node = ParseNode("<wazzup>", parent=node)
@@ -86,7 +92,7 @@ class Parser:
             self.advance()
             return
 
-        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}")
+        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
 
     def declarations(self, node):
@@ -121,7 +127,7 @@ class Parser:
                     self.declaration(node)
                 
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def statements(self, node):
         statements_node = ParseNode("<statements>", parent=node)
@@ -192,7 +198,7 @@ class Parser:
                         statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
                         self.advance()
                     else:
-                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                 elif self.backtracking(node, 3) == "<switch>":
                     if self.current_tok.keyword == "OMGWTF":
                         return
@@ -205,7 +211,7 @@ class Parser:
                         statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
                         self.advance()
                     else:
-                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
                 elif self.backtracking(node, 2) == "<if-then>":
                     if self.current_tok.keyword == "OIC":
@@ -215,12 +221,12 @@ class Parser:
                     elif self.current_tok.keyword == "NO WAI":
                         return
                     else:
-                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                 else:
                     node.children.append(statement_node)
                     self.expression(statement_node)
                 # else:
-                #     raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                #     raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
             return
         
     def expression(self, node):
@@ -263,7 +269,7 @@ class Parser:
             if self.current_tok.keyword == "O RLY?":
                 if_then_flag = True
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
         if not if_then_flag:
             node.children.append(expression_node)
@@ -287,7 +293,7 @@ class Parser:
                     self.advance()
                     return
                 else:
-                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                    raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def if_clause(self, node):
         if_clause_node = ParseNode("<if-clause>", parent=node)
@@ -301,7 +307,7 @@ class Parser:
             if self.current_tok.keyword == "NO WAI":
                 self.else_clause(node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
     # TODO: add support for MEBBE
     def else_if_clause(self, node):
@@ -313,7 +319,7 @@ class Parser:
             self.expression(else_if_clause_node)
             self.statements(else_if_clause_node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def else_clause(self, node):
         else_clause_node = ParseNode("<else-clause>", parent=node)
@@ -323,7 +329,7 @@ class Parser:
             self.advance()
             self.statements(else_clause_node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
     def comparison(self, node):
         comparison_node = ParseNode("<comparison>", parent=node)
@@ -347,7 +353,7 @@ class Parser:
                 else: 
                     self.value(comparison_node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     def boolean(self, node):
         boolean_node = ParseNode("<boolean>", parent=node)
@@ -381,7 +387,7 @@ class Parser:
                 boolean_node.children.append(ParseNode(self.current_tok.keyword, parent=boolean_node))
                 self.advance()
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     def typecasting(self, node):
         typecasting_node = ParseNode("<typecasting>", parent=node)
@@ -401,7 +407,7 @@ class Parser:
                 typecasting_node.children.append(ParseNode(self.current_tok.keyword, parent=typecasting_node))
                 self.advance()
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     # Just like assignment using R         
     def recasting(self, node):
@@ -419,9 +425,9 @@ class Parser:
                     recasting_node.children.append(ParseNode(self.current_tok.keyword, parent=recasting_node))
                     self.advance()
                 else:
-                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                    raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
             else: 
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
 
     def concatenation(self, node):
@@ -436,7 +442,7 @@ class Parser:
                 self.advance()
                 self.value(concatenation_node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def arithmetic(self, expression_node: ParseNode):
         arithmeticNode = ParseNode("<arithmetic>", parent=expression_node)
@@ -451,7 +457,7 @@ class Parser:
             self.advance()
             self.value(arithmeticNode)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     def function(self, node):
         function_node = ParseNode("<function>", parent=node)
@@ -469,15 +475,15 @@ class Parser:
                     while self.current_tok.keyword == "AN":
                         self.more_parameters(function_node)
                 else:
-                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                    raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                 self.statements(function_node)
                 if self.current_tok.keyword == "IF U SAY SO":
                     function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))
                     self.advance()
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     def parameter(self, node):
         parameter_node = ParseNode("<parameter>", parent=node)
@@ -486,7 +492,7 @@ class Parser:
             parameter_node.children.append(ParseNode(self.current_tok.keyword, parent=parameter_node))
             self.advance()
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     def more_parameters(self, node):
         more_parameters_node = ParseNode("<more_parameters>", parent=node)
@@ -499,9 +505,9 @@ class Parser:
                 self.advance()
                 self.parameter(more_parameters_node)
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
     def function_call(self, node):
         function_call_node = ParseNode("<function_call>", parent=node)
@@ -522,11 +528,11 @@ class Parser:
                     function_call_node.children.append(ParseNode(self.current_tok.keyword, parent=function_call_node))
                     self.advance()
                 else:
-                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")  
+                    raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")  
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
     def argument(self, node):
         argument_node = ParseNode("<argument>", parent=node)
@@ -544,9 +550,9 @@ class Parser:
                 self.advance()
                 self.argument(more_arguments_node)
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")  
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")  
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")      
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")      
 
     def loop(self, node):
         loop_node = ParseNode("<loop>", parent=node)
@@ -557,33 +563,33 @@ class Parser:
             self.advance()
 
             if self.current_tok.token_type != "Identifier":
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
             else:
                 # self.value(loop_node)
                 loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
                 self.advance()
 
                 if not (self.current_tok.keyword in ["UPPIN", "NERFIN"]):
-                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                    raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                 else:
                     loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
                     self.advance()
 
                     if self.current_tok.keyword != "YR":
-                        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                     else: 
                         loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
                         self.advance()
 
                         if self.current_tok.token_type != "Identifier":
-                            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                         else:    
                             self.value(loop_node)
                             # loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
                             # self.advance()
 
                             if not (self.current_tok.keyword in ["TIL", "WILE"]):
-                                # raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                                # raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                                 self.statements(loop_node)
                             else:
                                 loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
@@ -592,13 +598,13 @@ class Parser:
                                 self.statements(loop_node)
                                 
                             if self.current_tok.keyword != "IM OUTTA YR":
-                                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                             else:
                                 loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
                                 self.advance()
                                 
                                 if self.current_tok.token_type != "Identifier":
-                                    raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                                    raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                                 else:
                                     # self.value(loop_node)
                                     loop_node.children.append(ParseNode(self.current_tok.keyword, parent=loop_node))
@@ -616,7 +622,7 @@ class Parser:
                 switch_node.children.append(ParseNode(self.current_tok.keyword, parent=switch_node))
                 self.advance()
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def cases(self, node):
         cases_node = ParseNode("<cases>", parent=node)
@@ -636,7 +642,7 @@ class Parser:
         if self.current_tok.keyword == "OIC":
             return
         
-        raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def case(self, node):
         case_node = ParseNode("<case>", parent=node)
@@ -647,7 +653,7 @@ class Parser:
             self.literal(case_node)
             self.statements(case_node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def default(self, node):
         default_node = ParseNode("<default>", parent=node)
@@ -657,7 +663,7 @@ class Parser:
             self.advance()
             self.statements(default_node)
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def value(self, node):
         value_node = ParseNode("<value>", parent=node)
@@ -675,7 +681,7 @@ class Parser:
             node.children.append(value_node)
             self.expression(value_node)
         # else:
-        #     raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+        #     raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def literal(self, node):
         literal_node = ParseNode("<literal>", parent=node)
@@ -706,7 +712,7 @@ class Parser:
             type_node.children.append(ParseNode(self.current_tok.keyword, parent=type_node))
             self.advance()
         else:
-            raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+            raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
     
     def output(self, node):
         output_node = ParseNode("<output>", parent=node)
@@ -734,7 +740,7 @@ class Parser:
                 input_node.children.append(ParseNode(self.current_tok.keyword, parent=input_node))
                 self.advance()
             else:
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
         return
     
@@ -750,7 +756,7 @@ class Parser:
                 self.advance()
                 self.value(assignment_node)
             else: 
-                raise Exception(f"Syntax Error: Invalid token: {self.current_tok.keyword}: {self.current_tok.token_type}")
+                raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
 
        
     
