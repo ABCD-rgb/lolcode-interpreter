@@ -71,7 +71,7 @@ class InterpreterGUI:
         self.symbol_table_label.grid(row=0, column=2, pady=2)
 
         # Text Editor
-        self.text_editor = scrolledtext.ScrolledText(root, width=60, height=20)
+        self.text_editor = scrolledtext.ScrolledText(root, width=70, height=20)
         self.text_editor.grid(row=1, column=0, pady=2, padx=2, sticky="nsew")
 
         # List of Tokens
@@ -89,6 +89,10 @@ class InterpreterGUI:
         # View parse tree button
         self.view_tree_button = tk.Button(root, text="View Parse Tree", command=self.view_parse_tree)
         self.view_tree_button.grid(row=2, column=2, pady=2)
+
+        # Clear console button
+        self.clear_console_button = tk.Button(root, text="Clear Console", command=self.clear_console)
+        self.clear_console_button.grid(row=2, column=0, pady=2)
 
         # Console
         self.console = scrolledtext.ScrolledText(root, width=80, height=20)
@@ -114,6 +118,12 @@ class InterpreterGUI:
 
         # To restore stdin, stdout, and stderr on application exit
         root.protocol("WM_DELETE_WINDOW", self.restore)
+
+    def clear_console(self):
+        # Delete previous content of the terminal
+        self.console.config(state="normal")
+        self.console.delete('1.0', tk.END)
+        self.console.config(state="disabled")
 
     # get input from dialog box
     def get_input_from_dialog(self):
@@ -161,8 +171,6 @@ class InterpreterGUI:
             else:
                 print("Error creating a file. Please put a file name")
 
-        self.console.delete('1.0', tk.END)
-
         # get the lexemes
         self.lexemes = lexer(self.file_path)
         # clear symbol table
@@ -193,6 +201,10 @@ class InterpreterGUI:
             self.symbol_table.insert("", "end", values=identifier)
 
     def open_file(self):
+        # Clear the tables
+        self.lexemes_table.clear_table()
+        self.symbol_table.clear_table()
+
         file_path = filedialog.askopenfilename(filetypes=[("LOLCODE files", "*.lol"), ("All files", "*.*")])
 
         if file_path:
