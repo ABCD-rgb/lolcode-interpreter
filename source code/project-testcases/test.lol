@@ -10,12 +10,40 @@ HAI
         FOUND YR SUM OF x AN y
     IF U SAY SO
 
+    
+    HOW IZ I factorial YR x
+	VISIBLE EITHER OF BOTH SAEM x AN 0 AN BOTH SAEM x AN 1
+	VISIBLE x
+        EITHER OF BOTH SAEM x AN 0 AN BOTH SAEM x AN 1
+        BTW BOTH SAEM x AN 1
+	O RLY?
+            YA RLY
+                VISIBLE "in YA RLY"
+		VISIBLE 1
+                FOUND YR 1
+            NO WAI
+                VISIBLE "in NO WAI"
+		BTW VISIBLE x
+		BTW VISIBLE PRODUKT OF x AN I IZ factorial YR DIFF OF x AN 1 MKAY
+                FOUND YR PRODUKT OF x AN I IZ factorial YR DIFF OF x AN 1 MKAY
+        OIC
+        
+    IF U SAY SO
+    
+    
+    OBTW
+    HOW IZ I factorial YR x
+        FOUND YR 1
+    IF U SAY SO
+    TLDR
+    
+
     WAZZUP
         BTW variable dec
         I HAS A monde
         I HAS A choice
         I HAS A some
-        I HAS A num ITZ 2
+        I HAS A num ITZ 4
         I HAS A num2 ITZ 3
         I HAS A name ITZ "seventeen"
         I HAS A fnum ITZ 5
@@ -26,9 +54,18 @@ HAI
 
 
 
+    OBTW
+    EITHER OF BOTH SAEM num AN 0 AN BOTH SAEM num AN 1
+    BTW BOTH SAEM num AN 1
+    O RLY?
+        YA RLY
+            VISIBLE 1 
+        NO WAI
+            VISIBLE 2
+    OIC
+    TLDR
 
-
-    I IZ addNum YR num AN YR num2 MKAY
+ 
     I IZ printName YR "qwert     $\\/? yu" MKAY
 
 
@@ -166,7 +203,47 @@ HAI
 			VISIBLE "Invalid Input!"
 	OIC
 
+	I IZ addNum YR num AN YR num2 MKAY
+	I IZ factorial YR num MKAY
+
 KTHXBYE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

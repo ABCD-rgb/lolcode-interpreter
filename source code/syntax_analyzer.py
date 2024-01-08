@@ -48,6 +48,14 @@ class Parser:
     def parse(self):
         res = self.program()
         return res
+
+    def isFunction(self, node):
+        # Traverse parent i times or when the parent is None
+        while node.parent is not None:
+            node = node.parent
+            if node.data == "<function>":
+                return True
+        return False
     
     
     def program(self):
@@ -178,6 +186,11 @@ class Parser:
                 elif self.current_tok.keyword == "I IZ":
                     node.children.append(statement_node)
                     self.function_call(statement_node)
+                elif self.current_tok.keyword == "FOUND YR" and self.isFunction(node):
+                    node.children.append(statement_node)
+                    statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
+                    self.advance()
+                    self.value(statement_node)
                 elif self.backtracking(node, 1) == "<function>":
                     if self.current_tok.keyword == "IF U SAY SO":
                         return
@@ -190,6 +203,15 @@ class Parser:
                         statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
                         self.advance()
                         self.value(statement_node)
+                    else:
+                        node.children.append(statement_node)
+                        expression_node = self.expression(statement_node)
+                        
+                        # Check if current token if for if-then
+                        if self.current_tok.keyword == "O RLY?":
+                            self.if_then(expression_node, statement_node)
+                        else:
+                            statement_node.children.append(expression_node)
                 elif self.backtracking(node, 1) == "<loop>":
                     if self.current_tok.keyword == "IM OUTTA YR":
                         return
@@ -211,7 +233,14 @@ class Parser:
                         statement_node.children.append(ParseNode(self.current_tok.keyword, parent=statement_node))
                         self.advance()
                     else:
-                        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
+                        node.children.append(statement_node)
+                        expression_node = self.expression(statement_node)
+                        
+                        # Check if current token if for if-then
+                        if self.current_tok.keyword == "O RLY?":
+                            self.if_then(expression_node, statement_node)
+                        else:
+                            statement_node.children.append(expression_node)
 
                 elif self.backtracking(node, 2) == "<if-then>":
                     if self.current_tok.keyword == "OIC":
@@ -221,10 +250,23 @@ class Parser:
                     elif self.current_tok.keyword == "NO WAI":
                         return
                     else:
-                        raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
+                        node.children.append(statement_node)
+                        expression_node = self.expression(statement_node)
+                        
+                        # Check if current token if for if-then
+                        if self.current_tok.keyword == "O RLY?":
+                            self.if_then(expression_node, statement_node)
+                        else:
+                            statement_node.children.append(expression_node)
                 else:
                     node.children.append(statement_node)
-                    self.expression(statement_node)
+                    expression_node = self.expression(statement_node)
+                    
+                    # Check if current token if for if-then
+                    if self.current_tok.keyword == "O RLY?":
+                        self.if_then(expression_node, statement_node)
+                    else:
+                        statement_node.children.append(expression_node)
                 # else:
                 #     raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
             return
@@ -234,54 +276,38 @@ class Parser:
         arithmeticExpressions = ["SUM OF", "DIFF OF", "PRODUKT OF", "QUOSHUNT OF", "MOD OF", "BIGGR OF", "SMALLR OF"]
         booleanExpressions = ["BOTH OF", "EITHER OF", "WON OF", "NOT", "ALL OF", "ANY OF"]
         comparisonExpressions = ["BOTH SAEM", "DIFFRINT"]
-        if_then_flag = False
         # <arithmetic>
         if self.current_tok.keyword in arithmeticExpressions:
             self.arithmetic(expression_node)
         # <concatenation>
         elif self.current_tok.keyword == "SMOOSH":
             self.concatenation(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         # <boolean>
         elif self.current_tok.keyword in booleanExpressions:
             self.boolean(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         # <comparison>
         elif self.current_tok.keyword in comparisonExpressions:
             self.comparison(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         # Typecasting
         elif self.current_tok.keyword == "MAEK":
             self.typecasting(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         # Recasting
         elif self.current_tok.token_type == "Identifier" and self.lookAhead(1) is not None and self.lookAhead(1).keyword == "IS NOW A":
             self.recasting(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         # function call
         elif self.current_tok.keyword == "I IZ":
             self.function_call(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         # NOTE: newly added to accept identifier as an expression
         # identifier
         elif self.current_tok.token_type == "Identifier":
-            print("here")
             self.value(expression_node)
-            if self.current_tok.keyword == "O RLY?":
-                if_then_flag = True
         else:
             raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
         
-        if not if_then_flag:
-            node.children.append(expression_node)
-        else:
-            self.if_then(expression_node, node)            
+        if node.data == "<statement>":
+            return expression_node
+        node.children.append(expression_node)
+      
         
             
             
@@ -484,6 +510,7 @@ class Parser:
                 else:
                     raise Exception(f"SyntaxError: Missing/Invalid token before or after '{self.current_tok.keyword} {self.check_advance().keyword}'")
                 self.statements(function_node)
+
                 if self.current_tok.keyword == "IF U SAY SO":
                     function_node.children.append(ParseNode(self.current_tok.keyword, parent=function_node))
                     self.advance()

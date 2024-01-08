@@ -431,7 +431,7 @@ class Interpreter:
         if it_value in cases_list.keys():
             gtfo_flag = self.interpret_StatementsNode(cases_list[it_value])        
         
-        if gtfo_flag == []:
+        if gtfo_flag == {}:
             gtfo_flag = False
             return
         self.interpret_StatementsNode(default_case)
@@ -455,27 +455,44 @@ class Interpreter:
         noMatch = True
         # if expression is true, execute statements
         if expression_value:
-            self.interpret_StatementsNode(if_clause.children[1])
+            retval = self.interpret_StatementsNode(if_clause.children[1])
+            if retval == []:
+                self.symbolTable.add_variable("IT", None)
+            else:
+                self.symbolTable.add_variable("IT", retval)
         # if expression is false, check elif clauses
         else:
             for elif_clause in elif_clauses:
                 # if expression is true, execute statements and break
                 if self.interpret_ExpressionNode(elif_clause.children[1]):
-                    self.interpret_StatementsNode(elif_clause.children[2])
+                    retval = self.interpret_StatementsNode(elif_clause.children[2])
+                    if retval == []:
+                        self.symbolTable.add_variable("IT", None)
+                    else:
+                        self.symbolTable.add_variable("IT", retval)
                     noMatch = False
                     break
             # if no elif clause is true, execute else clause
             if noMatch:
                 for child in node.children:
-                    if child.data == "<else>":
-                        self.interpret_StatementsNode(child.children[1])
+                    if child.data == "<else-clause>":
+                        retval = self.interpret_StatementsNode(child.children[1])
+                        if retval == []:
+                            self.symbolTable.add_variable("IT", None)
+                        else:
+                            self.symbolTable.add_variable("IT", retval)       
                         break        
                 
     
     def interpret_StatementsNode(self, node: ParseNode):
         for child in node.children:
             if child.children[0].data == "GTFO":
-                return []
+                # Find a function parent node
+                function_parent = self.backtracking(child, "<function>")
+                if function_parent != None:
+                    # store None to the IT of the function symbol table
+                    return []
+                return {}
             if child.children[0].data == "FOUND YR":
                 return self.interpret_ValueNode(child.children[1])
             self.interpret_StatementNode(child)
@@ -591,9 +608,9 @@ class Interpreter:
             value = self.interpret_RecastingNode(expression_node)
             return value
         elif expression_node.data == "<function_call>":
-            self.interpret_FunctionCallNode(expression_node)
-            return self.symbolTable.get_variable("IT")
-
+            value = self.interpret_FunctionCallNode(expression_node)
+            # return self.symbolTable.get_variable("IT")
+            return value
 
     def interpret_FunctionCallNode(self, node: ParseNode):
         function_name = node.children[1].data
@@ -635,14 +652,13 @@ class Interpreter:
         
         # Execute the function body
         retval = self.interpret_StatementsNode(function.function_body)
-        if retval == []:
-            retval = None
             
         # Pop the function from the call stack
         self.main_symbol_table.pop_call_stack()
         
         # clear the function symbol table
         function.clear_function_symbol_table()
+
         
         # Set the current symbol table to the previous or main symbol table
         if self.main_symbol_table.call_stack == []:
@@ -654,12 +670,16 @@ class Interpreter:
             self.symbolTable = self.main_symbol_table.call_stack[-1].function_symbol_table
             current_function = self.main_symbol_table.call_stack[-1]
             self.main_symbol_table.set_current_function(current_function)
-        
-        # Return the value of the function to its caller
-        self.symbolTable.add_variable("IT", retval)
+            
 
         # update symbol table
         app.populate_symbol_table(self.main_symbol_table.variables)
+        
+        # Return the value of the function to its caller
+        if retval == []:
+            self.symbolTable.add_variable("IT", None)
+        elif retval:
+            self.symbolTable.add_variable("IT", retval)
         
         return retval
             
@@ -1287,7 +1307,7 @@ class InterpreterGUI:
                 self.text_editor.delete(1.0, tk.END)
                 self.text_editor.insert(tk.END, file_content)
 
-        self.file_path = file_path
+            self.file_path = file_path
 
     def create_scrollable_table(self, parent, headers):
         table_frame = tk.Frame(parent)

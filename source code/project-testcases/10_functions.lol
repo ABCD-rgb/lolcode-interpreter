@@ -30,10 +30,13 @@ HAI
     I IZ printName YR name MKAY
     VISIBLE IT
 
-    I IZ printNum YR SUM OF num1 AN IT MKAY
+    I IZ printNum YR SUM OF num1 AN 2 MKAY
     VISIBLE IT
 
 KTHXBYE
+
+
+
 
 
 
