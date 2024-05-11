@@ -68,18 +68,18 @@ class SymbolTable:
                     return value
                 else:
                     # If name is not in the list of valid names, is not a function, and is not a keyword, raise an error
-                    raise Exception("Error: Variable '" + name + "' is not defined in this scope")
+                    raise Exception("NameError: Variable '" + name + "' is not defined in this scope")
     
     def add_function(self, name, value):
         # Check if function name is in the list already, raise error if it is
         if name in self.functions:
-            raise Exception("Error: Function '" + name + "' is already defined in this scope")
+            raise Exception("NameError: Function '" + name + "' is already defined in this scope")
         self.functions[name] = value
         
     def get_function(self, name):
         # Check if function name exists in the list of functions, raise error if it doesn't
         if name not in self.functions:
-            raise Exception("Error: Function '" + name + "' is not defined in this scope")
+            raise Exception("NameError: Function '" + name + "' is not defined in this scope")
         return self.functions[name]
     
     def push_call_stack(self, value):
@@ -204,7 +204,7 @@ class Interpreter:
         symbol_name = node.children[1].data
         # Check if symbol_name is in the symbol table already, raise error if it is
         if symbol_name in self.symbolTable.variables:
-            raise Exception("Error: Variable '" + symbol_name + "' is already defined in this scope") 
+            raise Exception("NameError: Variable '" + symbol_name + "' is already defined in this scope") 
         
         if len(node.children) == 4:
             symbol_value = self.interpret_ValueNode(node.children[3])
@@ -295,7 +295,7 @@ class Interpreter:
     def interpret_LoopNode(self, node: ParseNode):
         loop_label = node.children[1].data
         if loop_label != node.children[-1].data:
-            raise Exception(f"Error: Loop label {loop_label} and {node.children[-1].data} does not match")
+            raise Exception(f"NameError: Loop label {loop_label} and {node.children[-1].data} does not match")
         
         loop_operation = node.children[2].data
         
@@ -303,7 +303,7 @@ class Interpreter:
             float(self.interpret_ValueNode(node.children[4]))
             loop_variable = node.children[4]
         except:
-            raise Exception("Error: Loop condition must be castable to a NUMBAR")
+            raise Exception("TypeError: Loop condition must be castable to a NUMBAR")
         
         
         loop_type = None if node.children[5].data not in ["WILE", "TIL"] else node.children[5].data
@@ -428,10 +428,10 @@ class Interpreter:
                 cases_list[case_key] = case_body
             elif case.data == "<default>":  
                 default_case= case.children[1]
-        if it_value in cases_list:
+        if it_value in cases_list.keys():
             gtfo_flag = self.interpret_StatementsNode(cases_list[it_value])        
         
-        if gtfo_flag == []:
+        if gtfo_flag == {}:
             gtfo_flag = False
             return
         self.interpret_StatementsNode(default_case)
@@ -455,27 +455,44 @@ class Interpreter:
         noMatch = True
         # if expression is true, execute statements
         if expression_value:
-            self.interpret_StatementsNode(if_clause.children[1])
+            retval = self.interpret_StatementsNode(if_clause.children[1])
+            if retval == []:
+                self.symbolTable.add_variable("IT", None)
+            else:
+                self.symbolTable.add_variable("IT", retval)
         # if expression is false, check elif clauses
         else:
             for elif_clause in elif_clauses:
                 # if expression is true, execute statements and break
                 if self.interpret_ExpressionNode(elif_clause.children[1]):
-                    self.interpret_StatementsNode(elif_clause.children[2])
+                    retval = self.interpret_StatementsNode(elif_clause.children[2])
+                    if retval == []:
+                        self.symbolTable.add_variable("IT", None)
+                    else:
+                        self.symbolTable.add_variable("IT", retval)
                     noMatch = False
                     break
             # if no elif clause is true, execute else clause
             if noMatch:
                 for child in node.children:
-                    if child.data == "<else>":
-                        self.interpret_StatementsNode(child.children[1])
+                    if child.data == "<else-clause>":
+                        retval = self.interpret_StatementsNode(child.children[1])
+                        if retval == []:
+                            self.symbolTable.add_variable("IT", None)
+                        else:
+                            self.symbolTable.add_variable("IT", retval)       
                         break        
                 
     
     def interpret_StatementsNode(self, node: ParseNode):
         for child in node.children:
             if child.children[0].data == "GTFO":
-                return []
+                # Find a function parent node
+                function_parent = self.backtracking(child, "<function>")
+                if function_parent != None:
+                    # store None to the IT of the function symbol table
+                    return []
+                return {}
             if child.children[0].data == "FOUND YR":
                 return self.interpret_ValueNode(child.children[1])
             self.interpret_StatementNode(child)
@@ -568,6 +585,17 @@ class Interpreter:
             app.populate_symbol_table(self.main_symbol_table.variables)
 
             return value
+        # NOTE: newly added to store value to IT
+        elif expression_node.data == "<value>":
+            # value needs to be an identifier
+            if expression_node.children[0].data == "<identifier>":
+                value = self.interpret_ValueNode(expression_node)
+                self.symbolTable.add_variable("IT", value)
+
+                # update symbol table
+                app.populate_symbol_table(self.main_symbol_table.variables)
+
+                return value
         elif expression_node.data == "<typecasting>":
             value = self.interpret_TypecastingNode(expression_node)
             self.symbolTable.add_variable("IT", value)
@@ -580,9 +608,9 @@ class Interpreter:
             value = self.interpret_RecastingNode(expression_node)
             return value
         elif expression_node.data == "<function_call>":
-            self.interpret_FunctionCallNode(expression_node)
-            return self.symbolTable.get_variable("IT")
-
+            value = self.interpret_FunctionCallNode(expression_node)
+            # return self.symbolTable.get_variable("IT")
+            return value
 
     def interpret_FunctionCallNode(self, node: ParseNode):
         function_name = node.children[1].data
@@ -601,11 +629,11 @@ class Interpreter:
                         parameters.append(self.interpret_ValueNode(params.children[0]))
         
         if node.children[-1].data != "MKAY":
-            raise Exception("Error: Function call does not end with MKAY")
+            raise Exception(f"SyntaxError: Function call '{function_name}' does not end with MKAY")
                         
         # Check if the number of parameters is equal to the number of function parameters
         if len(parameters) != len(function.function_parameters):
-            raise Exception("Error: Number of parameters does not match the number of function parameters")
+            raise Exception(f"TypeError: Number of parameters in function call '{function_name}' does not match the number of function parameters")
         
         # Add the parameters to the function symbol table
         for i in range(len(parameters)):
@@ -624,14 +652,13 @@ class Interpreter:
         
         # Execute the function body
         retval = self.interpret_StatementsNode(function.function_body)
-        if retval == []:
-            retval = None
             
         # Pop the function from the call stack
         self.main_symbol_table.pop_call_stack()
         
         # clear the function symbol table
         function.clear_function_symbol_table()
+
         
         # Set the current symbol table to the previous or main symbol table
         if self.main_symbol_table.call_stack == []:
@@ -643,12 +670,16 @@ class Interpreter:
             self.symbolTable = self.main_symbol_table.call_stack[-1].function_symbol_table
             current_function = self.main_symbol_table.call_stack[-1]
             self.main_symbol_table.set_current_function(current_function)
-        
-        # Return the value of the function to its caller
-        self.symbolTable.add_variable("IT", retval)
+            
 
         # update symbol table
         app.populate_symbol_table(self.main_symbol_table.variables)
+        
+        # Return the value of the function to its caller
+        if retval == []:
+            self.symbolTable.add_variable("IT", None)
+        elif retval:
+            self.symbolTable.add_variable("IT", retval)
         
         return retval
             
@@ -669,7 +700,7 @@ class Interpreter:
                 except:
                     value = float(value)
             except:
-                raise Exception(f"Typecast Error: '{value}' cannot be casted to NUMBR or NUMBAR")
+                raise Exception(f"TypecastError: '{value}' cannot be casted to NUMBR or NUMBAR")
         elif value == None:
             value = 0
         return value
@@ -715,7 +746,7 @@ class Interpreter:
         elif operator == "QUOSHUNT OF":
             # Division by zero error    
             if right_value == 0:
-                raise Exception("Division by Zero Error: Cannot divide by zero")
+                raise Exception("ZeroDivisionError: Cannot divide by zero")
             # print(left_value / right_value)
             return left_value / right_value
         elif operator == "MOD OF":
@@ -827,9 +858,9 @@ class Interpreter:
 
             # check type (no automatic typecasting)
             if type(left_value) != int and type(left_value) != float:
-                raise Exception(f"Type Error: '{left_value}' is not a NUMBR or NUMBAR")
+                raise Exception(f"TypeError: '{left_value}' should be a NUMBR or NUMBAR")
             if type(right_value) != int and type(right_value) != float:
-                raise Exception(f"Type Error: '{right_value}' is not a NUMBR or NUMBAR")
+                raise Exception(f"TypeError: '{right_value}' should be a NUMBR or NUMBAR")
 
             if operator == "BOTH SAEM":
                 # print(operator, (left_value == right_value))
@@ -848,12 +879,12 @@ class Interpreter:
 
             # check type (no automatic typecasting)
             if type(left_value) != int and type(left_value) != float:
-                raise Exception(f"Type Error: '{left_value}' is not a NUMBR or NUMBAR")
+                raise Exception(f"TypeError: '{left_value}' should be a NUMBR or NUMBAR")
             if type(right_value) != int and type(right_value) != float:
-                raise Exception(f"Type Error: '{right_value}' is not a NUMBR or NUMBAR")
+                raise Exception(f"TypeError: '{right_value}' should be a NUMBR or NUMBAR")
             # left_value should have the same value as left_value2
             if left_value != left_value2:
-                raise Exception(f"Type Error: '{left_value}' is not equal to '{left_value2}'")
+                raise Exception(f"TypeError: '{left_value}' should be equal to '{left_value2}'")
             
             if operator == "BOTH SAEM":
                 if operator2 == "BIGGR OF":
@@ -903,7 +934,7 @@ class Interpreter:
                 typecast_type = node.children[2].data
 
             if typecast_type == "NOOB":
-                raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NOOB")
+                raise Exception(f"TypecastError: '{only_value}' cannot be casted to NOOB")
             elif typecast_type == "TROOF":
                 if not only_value:
                     # print("FAIL")
@@ -919,7 +950,7 @@ class Interpreter:
                         # print(float(only_value))
                         return float(only_value)
                 except:
-                    raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBAR")
+                    raise Exception(f"TypecastError: '{only_value}' cannot be casted to NUMBAR")
             elif typecast_type == "NUMBR":
                 try:
                     if only_value == None:
@@ -928,7 +959,7 @@ class Interpreter:
                         # print(int(only_value))
                         return int(only_value)
                 except:
-                    raise Exception(f"Typecast Error: '{only_value}' cannot be casted to NUMBR")
+                    raise Exception(f"TypecastError: '{only_value}' cannot be casted to NUMBR")
             elif typecast_type == "YARN":
                 if only_value == None:
                     return ""
@@ -982,7 +1013,7 @@ class Interpreter:
             typecast_type = node.children[2].data
             
             if typecast_type == "NOOB":
-                raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NOOB")
+                raise Exception(f"RecastingError: '{only_value}' cannot be casted to NOOB")
             elif typecast_type == "TROOF":
                 if not only_value:
                     # print("FAIL")
@@ -1017,7 +1048,7 @@ class Interpreter:
 
                         return self.symbolTable.get_variable(variable_name)
                 except:
-                    raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NUMBAR")
+                    raise Exception(f"RecastingError: '{only_value}' cannot be casted to NUMBAR")
             elif typecast_type == "NUMBR":
                 try:
                     if only_value == None:
@@ -1036,7 +1067,7 @@ class Interpreter:
                 
                         return self.symbolTable.get_variable(variable_name)
                 except:
-                    raise Exception(f"Recasting Error: '{only_value}' cannot be casted to NUMBR")
+                    raise Exception(f"RecastingError: '{only_value}' cannot be casted to NUMBR")
             elif typecast_type == "YARN":
                 if only_value == None:
                     self.symbolTable.add_variable(variable_name, "")
@@ -1239,7 +1270,7 @@ class InterpreterGUI:
 
         # clear symbol table
         self.symbols = SymbolTable()
-        # self.symbols.add_variable("IT", None)
+        self.symbols.add_variable("IT", None)
         self.parser = Parser(self.lexemes)
         self.tree = self.parser.parse()
         self.interpreter = Interpreter(self.tree, self.symbols)
@@ -1276,7 +1307,7 @@ class InterpreterGUI:
                 self.text_editor.delete(1.0, tk.END)
                 self.text_editor.insert(tk.END, file_content)
 
-        self.file_path = file_path
+            self.file_path = file_path
 
     def create_scrollable_table(self, parent, headers):
         table_frame = tk.Frame(parent)

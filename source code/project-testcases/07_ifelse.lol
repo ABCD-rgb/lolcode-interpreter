@@ -1,14 +1,8 @@
 HAI
-
-    WAZZUP
-	I HAS A choice ITZ "String"
-	I HAS A input ITZ 5.5
-	I HAS A bool ITZ WIN
-	I HAS A x
-    BUHBYE
-
-	DIFF OF 4 AN 3.14
-	SUM OF SUM OF SUM OF 3 AN 4 AN 2 AN 1
+	WAZZUP
+		I HAS A choice
+		I HAS A input
+	BUHBYE
 
 	BTW if w/o MEBBE, 1 only, everything else is invalid
 	VISIBLE "1. Compute age"
@@ -18,6 +12,9 @@ HAI
 
 	VISIBLE "Choice: "
 	GIMMEH choice
+
+        BTW convert choice to numerical value
+        choice IS NOW A NUMBAR
 
 	BOTH SAEM choice AN 1
 	O RLY?
@@ -39,6 +36,7 @@ HAI
 			VISIBLE "Square Area: " + PRODUKT OF input AN input
 		MEBBE BOTH SAEM choice AN 0
 			VISIBLE "Goodbye"
+
 		NO WAI
 			VISIBLE "Invalid Input!"
 	OIC
@@ -46,7 +44,16 @@ HAI
 	DIFFRINT BIGGR OF 3 AN choice AN 3
 	O RLY?
 		YA RLY
-			VISIBLE "Invalid input is > 3." !
+			VISIBLE "Invalid input is > 3."
 	OIC
 
 KTHXBYE
+
+
+
+
+
+
+
+
+
